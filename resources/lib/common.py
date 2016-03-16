@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from BeautifulSoup import BeautifulSoup
 from pyDes import *
 import uuid
 import cookielib
@@ -14,7 +13,6 @@ import xbmcplugin
 import xbmcgui
 import xbmcaddon
 import xbmc
-import urlparse
 import base64
 import binascii
 import hmac
@@ -41,7 +39,7 @@ def_fanart = os.path.join(pluginpath, 'fanart.jpg')
 na = 'not available'
 BASE_URL = 'https://www.amazon.de'
 ATV_URL = 'https://atv-eu.amazon.com'
-#ATV_URL = 'https://atv-ext-eu.amazon.com'
+# ATV_URL = 'https://atv-ext-eu.amazon.com'
 UserAgent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2566.0 Safari/537.36'
 movielib = '/gp/video/%s/movie/'
 tvlib = '/gp/video/%s/tv/'
@@ -52,22 +50,30 @@ verbLog = addon.getSetting('logging') == 'true'
 kodi_mjver = int(xbmc.getInfoLabel('System.BuildVersion')[0:2])
 Dialog = xbmcgui.Dialog()
 
-class _Info:
-    def __init__( self, *args, **kwargs ):
-        self.__dict__.update( kwargs )
 
-def getURL( url, host=BASE_URL.split('//')[1], useCookie=False, silent=False, headers=None):
+class _Info:
+
+    def __init__(self, *args, **kwargs):
+        self.__dict__.update(kwargs)
+
+
+def getURL(url, host=BASE_URL.split('//')[1], useCookie=False, silent=False, headers=None):
     cj = cookielib.LWPCookieJar()
     if useCookie:
-        if isinstance(useCookie, bool): cj = mechanizeLogin()
-        else: cj = useCookie
-        if isinstance(cj, bool): return False
+        if isinstance(useCookie, bool):
+            cj = mechanizeLogin()
+        else:
+            cj = useCookie
+        if isinstance(cj, bool):
+            return False
     dispurl = url
     dispurl = re.sub('(?i)%s|%s|&token=\w+' % (tvdb, tmdb), '', url).strip()
-    if not silent: Log('getURL: '+dispurl)
-    if not headers: headers = [('User-Agent', UserAgent ), ('Host', host)]
+    if not silent:
+        Log('getURL: ' + dispurl)
+    if not headers:
+        headers = [('User-Agent', UserAgent), ('Host', host)]
     try:
-        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj),urllib2.HTTPRedirectHandler)
+        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj), urllib2.HTTPRedirectHandler)
         opener.addheaders = headers
         usock = opener.open(url)
         response = usock.read()
@@ -77,17 +83,18 @@ def getURL( url, host=BASE_URL.split('//')[1], useCookie=False, silent=False, he
         return False
     return response
 
-def getATVURL( url , values = None ):
+
+def getATVURL(url, values=None):
     try:
         opener = urllib2.build_opener()
-        Log('ATVURL --> url = '+url)
-        opener.addheaders = [('x-android-sign', androidsig(url) )]
-        if values == None:
-            usock=opener.open(url)
+        Log('ATVURL --> url = ' + url)
+        opener.addheaders = [('x-android-sign', androidsig(url))]
+        if not values:
+            usock = opener.open(url)
         else:
             data = urllib.urlencode(values)
-            usock=opener.open(url,postdata)
-        response=usock.read()
+            usock = opener.open(url, postdata)
+        response = usock.read()
         usock.close()
     except urllib2.URLError, e:
         Log('Error reason: %s' % e, xbmc.LOGERROR)
@@ -95,98 +102,123 @@ def getATVURL( url , values = None ):
     else:
         return response
 
+
 def WriteLog(data, fn='', mode='a'):
-    if not verbLog: return
-    if fn: fn = '-' + fn
+    if not verbLog:
+        return
+    if fn:
+        fn = '-' + fn
     fn = __plugin__ + fn + '.log'
     path = os.path.join(homepath, fn)
-    if type(data) == type(unicode()): data = data.encode('utf-8')
+    if type(data) == type(unicode()):
+        data = data.encode('utf-8')
     file = open(path, mode)
     data = time.strftime('[%d.%m/%H:%M:%S] ', time.localtime()) + data.__str__()
     file.write(data)
     file.write('\n')
     file.close()
 
+
 def Log(msg, level=xbmc.LOGNOTICE):
-    if level == xbmc.LOGDEBUG and verbLog: level = xbmc.LOGNOTICE
+    if level == xbmc.LOGDEBUG and verbLog:
+        level = xbmc.LOGNOTICE
     if type(msg) == type(unicode()):
         msg = msg.encode('utf-8')
     WriteLog(msg)
     xbmc.log('[%s] %s' % (__plugin__, msg.__str__()), level)
 
+
 def SaveFile(path, data):
-    file = open(path,'w')
+    file = open(path, 'w')
     file.write(data)
     file.close()
+
 
 def androidsig(url):
     hmac_key = binascii.unhexlify('f5b0a28b415e443810130a4bcb86e50d800508cc')
     sig = hmac.new(hmac_key, url, hashlib.sha1)
-    return base64.encodestring(sig.digest()).replace('\n','')
+    return base64.encodestring(sig.digest()).replace('\n', '')
 
-def addDir(name, mode, sitemode, url='', thumb='', fanart='', infoLabels=False, totalItems=0, cm=False ,page=1,isHD=False, options=''):
+
+def addDir(name, mode, sitemode, url='', thumb='', fanart='', infoLabels=False, totalItems=0, cm=False, page=1, isHD=False, options=''):
     u = '%s?url=<%s>&mode=<%s>&sitemode=<%s>&name=<%s>&page=<%s>&opt=<%s>' % (sys.argv[0], urllib.quote_plus(url), mode, sitemode, urllib.quote_plus(name), urllib.quote_plus(str(page)), options)
-    try:fanart = args.fanart
-    except:pass
-    if fanart == '' or fanart == None or fanart == na: fanart = def_fanart
-    else: u += '&fanart=<%s>' % urllib.quote_plus(fanart)
-    if thumb == '' or thumb == None:
-        try:thumb = args.thumb
-        except:thumb = def_fanart
+    try:
+        fanart = args.fanart
+    except:
+        pass
+    if not fanart or fanart == na:
+        fanart = def_fanart
+    else:
+        u += '&fanart=<%s>' % urllib.quote_plus(fanart)
+    if not thumb:
+        try:
+            thumb = args.thumb
+        except:
+            thumb = def_fanart
     else:
         u += '&thumb=<%s>' % urllib.quote_plus(thumb)
-    item=xbmcgui.ListItem(name, iconImage="DefaultFolder.png", thumbnailImage=thumb)
-    item.setProperty('fanart_image',fanart)
+    item = xbmcgui.ListItem(name, iconImage="DefaultFolder.png", thumbnailImage=thumb)
+    item.setProperty('fanart_image', fanart)
     item.setProperty('IsPlayable', 'false')
     try:
         item.setProperty('TotalSeasons', str(infoLabels['TotalSeasons']))
-    except: pass
+    except:
+        pass
     if infoLabels:
         item.setInfo(type='Video', infoLabels=infoLabels)
     if cm:
-        item.addContextMenuItems( cm, replaceItems=False  )
-    xbmcplugin.addDirectoryItem(handle=pluginhandle,url=u,listitem=item,isFolder=True,totalItems=totalItems)
+        item.addContextMenuItems(cm, replaceItems=False)
+    xbmcplugin.addDirectoryItem(handle=pluginhandle, url=u, listitem=item, isFolder=True, totalItems=totalItems)
 
-def addVideo(name,asin,poster=False,fanart=False,infoLabels=False,totalItems=0,cm=False,trailer=False,isAdult=False,isHD=False):
+
+def addVideo(name, asin, poster=False, fanart=False, infoLabels=False, totalItems=0, cm=False, trailer=False, isAdult=False, isHD=False):
     if not infoLabels:
-        infoLabels={ "Title": name}
-    u  = '%s?asin=<%s>&mode=<play>&name=<%s>&sitemode=<PLAYVIDEO>&adult=<%s>' % (sys.argv[0], asin, urllib.quote_plus(name), str(isAdult))
+        infoLabels = {"Title": name}
+    u = '%s?asin=<%s>&mode=<play>&name=<%s>&sitemode=<PLAYVIDEO>&adult=<%s>' % (sys.argv[0], asin, urllib.quote_plus(name), str(isAdult))
     if poster:
-        liz=xbmcgui.ListItem(name, thumbnailImage=poster)
+        liz = xbmcgui.ListItem(name, thumbnailImage=poster)
     else:
-        liz=xbmcgui.ListItem(name)
-    if fanart == '' or fanart == None or fanart == na: fanart = def_fanart
-    liz.setProperty('fanart_image',fanart)
+        liz = xbmcgui.ListItem(name)
+    if not fanart or fanart == na:
+        fanart = def_fanart
+    liz.setProperty('fanart_image', fanart)
     liz.setProperty('IsPlayable', 'true')
 
     if not cm:
         cm = []
-    cm.insert(0, (getString(30101), 'Action(ToggleWatched)') )
+    cm.insert(0, (getString(30101), 'Action(ToggleWatched)'))
 
     if isHD:
-        liz.addStreamInfo('video', { 'width':1920 ,'height' : 1080 })
+        liz.addStreamInfo('video', {'width': 1920, 'height': 1080})
     else:
-        liz.addStreamInfo('video', { 'width':720 ,'height' : 480 })
-    if infoLabels['AudioChannels']: liz.addStreamInfo('audio', { 'codec': 'ac3' ,'channels': int(infoLabels['AudioChannels']) })
+        liz.addStreamInfo('video', {'width': 720, 'height': 480})
+    if infoLabels['AudioChannels']:
+        liz.addStreamInfo('audio', {'codec': 'ac3', 'channels': int(infoLabels['AudioChannels'])})
     if trailer:
         infoLabels['Trailer'] = u + '&trailer=<1>&selbitrate=<0>'
     u += '&trailer=<0>&selbitrate=<0>'
-    if infoLabels.has_key('Poster'): liz.setArt({'tvshow.poster': infoLabels['Poster']})
-    else: liz.setArt({'poster': poster})
+    if infoLabels.has_key('Poster'):
+        liz.setArt({'tvshow.poster': infoLabels['Poster']})
+    else:
+        liz.setArt({'poster': poster})
     liz.setInfo(type='Video', infoLabels=infoLabels)
-    liz.addContextMenuItems( cm , replaceItems=False )
-    xbmcplugin.addDirectoryItem(handle=pluginhandle,url=u,listitem=liz,isFolder=False,totalItems=totalItems)
+    liz.addContextMenuItems(cm, replaceItems=False)
+    xbmcplugin.addDirectoryItem(handle=pluginhandle, url=u, listitem=liz, isFolder=False, totalItems=totalItems)
+
 
 def addText(name):
     item = xbmcgui.ListItem(name)
     item.setProperty('IsPlayable', 'false')
-    xbmcplugin.addDirectoryItem(handle=pluginhandle,url=sys.argv[0],listitem=item)
+    xbmcplugin.addDirectoryItem(handle=pluginhandle, url=sys.argv[0], listitem=item)
+
 
 def toogleWatchlist(asin=False, action='add'):
     if not asin:
-        asin=args.asin
-        if args.remove == '1': action = 'remove'
-        else: action = 'add'
+        asin = args.asin
+        if args.remove == '1':
+            action = 'remove'
+        else:
+            action = 'add'
 
     cookie = mechanizeLogin()
     token = getToken(asin, cookie)
@@ -194,9 +226,11 @@ def toogleWatchlist(asin=False, action='add'):
     data = json.loads(getURL(url, useCookie=cookie))
     if data['success'] == 1:
         Log(asin + ' ' + data['status'])
-        if data['AsinStatus'] == 0: xbmc.executebuiltin('Container.Refresh')
+        if data['AsinStatus'] == 0:
+            xbmc.executebuiltin('Container.Refresh')
     else:
         Log(data['status'] + ': ' + data['reason'])
+
 
 def getToken(asin, cookie):
     url = BASE_URL + '/gp/aw/video/detail/' + asin
@@ -204,12 +238,14 @@ def getToken(asin, cookie):
     token = re.compile('token[^"]*"([^"]*)"').findall(data)[0]
     return urllib.quote_plus(token)
 
+
 def gen_id():
     guid = addon.getSetting("GenDeviceID")
     if not guid or len(guid) != 56:
         guid = hmac.new(UserAgent, uuid.uuid4().bytes, hashlib.sha224).hexdigest()
         addon.setSetting("GenDeviceID", guid)
     return guid
+
 
 def mechanizeLogin():
     cj = cookielib.LWPCookieJar()
@@ -225,9 +261,10 @@ def mechanizeLogin():
         Log('Login Retry: %s' % retrys)
         succeeded = dologin()
         if retrys >= 2:
-            Dialog.ok('Login Error','Failed to Login')
-            succeeded=True
+            Dialog.ok('Login Error', 'Failed to Login')
+            succeeded = True
     return succeeded
+
 
 def dologin():
     email = addon.getSetting('login_name')
@@ -240,7 +277,8 @@ def dologin():
         if keyboard.isConfirmed() and keyboard.getText():
             email = keyboard.getText()
             password = setLoginPW()
-            if password: changed = True
+            if password:
+                changed = True
     if password:
         if os.path.isfile(COOKIEFILE):
             os.remove(COOKIEFILE)
@@ -248,8 +286,8 @@ def dologin():
         br = mechanize.Browser()
         br.set_handle_robots(False)
         br.set_cookiejar(cj)
-        #br.set_debug_http(True)
-        #br.set_debug_responses(True)
+        # br.set_debug_http(True)
+        # br.set_debug_responses(True)
         br.addheaders = [('User-agent', UserAgent)]
         sign_in = br.open(BASE_URL + "/gp/aw/si.html")
         br.select_form(name="signIn")
@@ -270,6 +308,7 @@ def dologin():
             return cj
     return True
 
+
 def setLoginPW():
     keyboard = xbmc.Keyboard('', getString(30003), True)
     keyboard.doModal()
@@ -278,24 +317,31 @@ def setLoginPW():
         return password
     return False
 
+
 def encode(data):
-    k = triple_des((str(uuid.getnode())*2)[0:24], CBC, "\0\0\0\0\0\0\0\0", padmode=PAD_PKCS5)
+    k = triple_des((str(uuid.getnode()) * 2)[0:24], CBC, "\0\0\0\0\0\0\0\0", padmode=PAD_PKCS5)
     d = k.encrypt(data)
     return base64.b64encode(d)
 
+
 def decode(data):
-    if not data: return ''
-    k = triple_des((str(uuid.getnode())*2)[0:24], CBC, "\0\0\0\0\0\0\0\0", padmode=PAD_PKCS5)
+    if not data:
+        return ''
+    k = triple_des((str(uuid.getnode()) * 2)[0:24], CBC, "\0\0\0\0\0\0\0\0", padmode=PAD_PKCS5)
     d = k.decrypt(base64.b64decode(data))
     return d
 
+
 def cleanData(data):
     if type(data) == type(str()) or type(data) == type(unicode()):
-        if data.replace('-','').strip() == '': data = ''
+        if data.replace('-', '').strip() == '':
+            data = ''
         data = data.replace(u'\u00A0', ' ').replace(u'\u2013', '-')
         data = data.strip()
-        if data == '': data = None
+        if data == '':
+            data = None
     return data
+
 
 def cleanName(name, file=True):
     if file:
@@ -303,10 +349,12 @@ def cleanName(name, file=True):
         name = name.decode('utf-8')
     else:
         notallowed = ['<', '>', '"', '|', '*', '?']
-        if not os.path.supports_unicode_filenames: name = name.encode('utf-8')
+        if not os.path.supports_unicode_filenames:
+            name = name.encode('utf-8')
     for c in notallowed:
-        name = name.replace(c,'')
+        name = name.replace(c, '')
     return name
+
 
 def GET_ASINS(content):
     asins = ''
@@ -329,8 +377,10 @@ def GET_ASINS(content):
                         hd_key = True
                 if newasin not in asins:
                     asins += ',' + newasin
-        if 'STEREO' in format['audioFormatTypes']: channels = 2
-        if 'AC_3_5_1' in format['audioFormatTypes']: channels = 6
+        if 'STEREO' in format['audioFormatTypes']:
+            channels = 2
+        if 'AC_3_5_1' in format['audioFormatTypes']:
+            channels = 6
     """
     if content['childTitles']:
         feedurl = content['childTitles'][0]['feedUrl']
@@ -343,6 +393,7 @@ def GET_ASINS(content):
     del content
     return asins, hd_key, prime_key, channels
 
+
 def SCRAP_ASINS(url):
     asins = []
     url = BASE_URL + url + '?ie=UTF8&sortBy=DATE_ADDED_DESC'
@@ -352,20 +403,26 @@ def SCRAP_ASINS(url):
         return asins
     return []
 
+
 def getString(id, enc=False):
-    if enc: return addon.getLocalizedString(id).encode('utf-8')
+    if enc:
+        return addon.getLocalizedString(id).encode('utf-8')
     return addon.getLocalizedString(id)
 
+
 def remLoginData():
-    if os.path.isfile(COOKIEFILE): os.remove(COOKIEFILE)
+    if os.path.isfile(COOKIEFILE):
+        os.remove(COOKIEFILE)
     addon.setSetting('login_name', '')
     addon.setSetting('login_pass', '')
+
 
 def checkCase(title):
     if title.isupper():
         title = title.title().replace('[Ov]', '[OV]').replace('Bc', 'BC')
     title = title.replace('[dt./OV]', '')
     return title
+
 
 def getCategories():
     import urlparse
@@ -389,15 +446,18 @@ def getCategories():
                             querylist = urlparse.parse_qs(query)
                             alkey = None
                             for key in querylist.keys():
-                                if 'ASINLIST' in key: alkey = key
+                                if 'ASINLIST' in key:
+                                    alkey = key
                             asins[mainCatId].update({title: urlparse.parse_qs(query)[alkey][0]})
     return asins
 
+
 def SetView(content, view=False, updateListing=False):
     # 501-POSTER WRAP 503-MLIST3 504=MLIST2 508-FANARTPOSTER
-    confluence_views = [500,501,502,503,504,508,-1]
+    confluence_views = [500, 501, 502, 503, 504, 508, -1]
     xbmcplugin.setContent(pluginhandle, content)
-    xbmcplugin.endOfDirectory(pluginhandle,updateListing=updateListing)
+    xbmcplugin.endOfDirectory(pluginhandle, updateListing=updateListing)
+
 
 def compasin(list, searchstring):
     ret = False
@@ -406,6 +466,7 @@ def compasin(list, searchstring):
             list[index][1] = 1
             ret = True
     return ret, list
+
 
 def waitforDB(database):
     if database == 'tv':
@@ -427,6 +488,7 @@ def waitforDB(database):
             Log('Database locked')
     c.close()
 
+
 def getTypes(items, col):
     list = []
     lowlist = []
@@ -438,8 +500,10 @@ def getTypes(items, col):
                 if item not in list and item <> '' and item <> 0 and item <> 'Inc.' and item <> 'LLC.':
                     list.append(item)
             else:
-                if 'genres' in col: data = data.split('/')
-                else: data = re.split(r'[,;/]', data)
+                if 'genres' in col:
+                    data = data.split('/')
+                else:
+                    data = re.split(r'[,;/]', data)
                 for item in data:
                     item = item.strip()
                     if item.lower() not in lowlist and item <> '' and item <> 0 and item <> 'Inc.' and item <> 'LLC.':
@@ -451,6 +515,7 @@ def getTypes(items, col):
                 if strdata not in list:
                     list.append(strdata)
     return list
+
 
 def updateRunning():
     from datetime import datetime, timedelta
@@ -465,6 +530,7 @@ def updateRunning():
             return True
     return False
 
+
 def copyDB(ask=False):
     import shutil
     if ask:
@@ -472,7 +538,8 @@ def copyDB(ask=False):
             shutil.copystat(org_tvDBfile, tvDBfile)
             shutil.copystat(org_MovieDBfile, MovieDBfile)
             return
-    import tv, movies
+    import tv
+    import movies
     tv.tvDB.close()
     movies.MovieDB.close()
     shutil.copy2(org_tvDBfile, tvDBfile)
@@ -496,6 +563,6 @@ if addon.getSetting('customdbfolder') == 'true':
         if org_fileacc > cur_fileacc:
             copyDB(True)
 
-urlargs =  urllib.unquote_plus(sys.argv[2][1:].replace('&', ', ')).replace('<','"').replace('>','"')
+urlargs = urllib.unquote_plus(sys.argv[2][1:].replace('&', ', ')).replace('<', '"').replace('>', '"')
 Log('Args: %s' % urlargs)
 exec "args = _Info(%s)" % urlargs
