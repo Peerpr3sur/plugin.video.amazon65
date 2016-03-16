@@ -25,9 +25,10 @@ __plugin__ = addon.getAddonInfo('name')
 __authors__ = addon.getAddonInfo('author')
 __credits__ = ""
 __version__ = addon.getAddonInfo('version')
+__addonid__ = addon.getAddonInfo('id')
 profilpath = xbmc.translatePath('special://masterprofile/').decode('utf-8')
 pluginpath = addon.getAddonInfo('path').decode('utf-8')
-pldatapath = xbmc.translatePath('special://profile/addon_data/' + addon.getAddonInfo('id')).decode('utf-8')
+pldatapath = xbmc.translatePath('special://profile/addon_data/' + __addonid__).decode('utf-8')
 homepath = xbmc.translatePath('special://home').decode('utf-8')
 dbplugin = 'script.module.amazon.database'
 dbpath = os.path.join(homepath, 'addons', dbplugin, 'lib')
@@ -72,7 +73,7 @@ class _Info:
 def log(txt):
     if isinstance(txt, str):
         txt = txt.decode("utf-8", 'ignore')
-    message = u'%s: %s' % (ADDON_ID, txt)
+    message = u'%s: %s' % (__addonid__, txt)
     xbmc.log(msg=message.encode("utf-8", 'ignore'),
              level=xbmc.LOGDEBUG)
 
