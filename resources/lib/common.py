@@ -397,13 +397,6 @@ def SetView(content, view=False, updateListing=False):
     # 501-POSTER WRAP 503-MLIST3 504=MLIST2 508-FANARTPOSTER
     confluence_views = [500,501,502,503,504,508,-1]
     xbmcplugin.setContent(pluginhandle, content)
-    viewenable = addon.getSetting("viewenable")
-    if viewenable == 'true' and view:
-        viewid = confluence_views[int(addon.getSetting(view))]
-        if viewid == -1:
-            viewid = int(addon.getSetting(view.replace('view', 'id')))
-        if kodi_mjver >= 14: xbmc.executebuiltin('ActivateWindow(%s)' % winid)
-        xbmc.executebuiltin('Container.SetViewMode(%s)' % viewid)
     xbmcplugin.endOfDirectory(pluginhandle,updateListing=updateListing)
 
 def compasin(list, searchstring):
