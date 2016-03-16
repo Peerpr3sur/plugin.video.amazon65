@@ -66,6 +66,13 @@ def IStreamPlayback(url, asin, trailer):
     xbmcplugin.setResolvedUrl(pluginhandle, True, listitem=listitem)
 
 
+def PLAYVIDEO():
+    amazonUrl = common.BASE_URL + "/dp/" + common.args.asin
+    trailer = common.args.trailer
+    xbmc.Player().stop()
+    IStreamPlayback(amazonUrl, common.args.asin, trailer)
+
+
 def check_output(*popenargs, **kwargs):
     p = subprocess.Popen(stdout=subprocess.PIPE, stderr=subprocess.STDOUT, *popenargs, **kwargs)
     out, err = p.communicate()
