@@ -39,14 +39,15 @@ def_fanart = os.path.join(pluginpath, 'fanart.jpg')
 na = 'not available'
 
 selectLanguage = addon.getSetting("selectLanguage")
-siteVersion = addon.getSetting("siteVersion")
+siteVersion = int(addon.getSetting("siteVersion"))
 siteVersionsList = ["com", "co.uk", "de", "jp"]
-apiMain = ["atv-ps", "atv-ps-eu", "atv-ps-eu"][int(siteVersion)]
-marketplaceId = ["ATVPDKIKX0DER", "A1F83G8C2ARO7P", "A1PA6795UKMFR9", "A1VC38T7YXB528"][int(siteVersion)]
-siteVersion = siteVersionsList[int(siteVersion)]
-urlMainS = "https://www.amazon." + siteVersion
-urlMain = "http://www.amazon." + siteVersion
+apiMain = ["atv-ps", "atv-ps-eu", "atv-ps-eu"][siteVersion]
+marketplaceId = ["ATVPDKIKX0DER", "A1F83G8C2ARO7P", "A1PA6795UKMFR9", "A1VC38T7YXB528"][siteVersion]
+siteVersion = siteVersionsList[siteVersion]
 
+
+# not workin yet
+BASE_URL = "https://www.amazon." + siteVersion
 
 BASE_URL = 'https://www.amazon.de'
 ATV_URL = 'https://atv-eu.amazon.com'
@@ -479,8 +480,6 @@ def getCategories():
 
 
 def SetView(content, view=False, updateListing=False):
-    # 501-POSTER WRAP 503-MLIST3 504=MLIST2 508-FANARTPOSTER
-    confluence_views = [500, 501, 502, 503, 504, 508, -1]
     xbmcplugin.setContent(pluginhandle, content)
     xbmcplugin.endOfDirectory(pluginhandle, updateListing=updateListing)
 
