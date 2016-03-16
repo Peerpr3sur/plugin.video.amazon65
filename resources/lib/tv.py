@@ -5,6 +5,7 @@ from BeautifulSoup import BeautifulStoneSoup
 from BeautifulSoup import BeautifulSoup
 import common
 import appfeed
+import urlparse
 
 try:
     from sqlite3 import dbapi2 as sqlite
@@ -17,7 +18,7 @@ xbmcgui = common.xbmcgui
 re = common.re
 json = common.json
 os = common.os
-urlparse = common.urlparse
+urlparse = urlparse
 
 # TV db
 MAX = int(common.addon.getSetting("mov_perpage"))
