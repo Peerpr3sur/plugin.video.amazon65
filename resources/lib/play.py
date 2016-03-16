@@ -25,65 +25,22 @@ osWindows = 1
 osLinux = 2
 osOSX = 3
 osAndroid = 4
-if xbmc.getCondVisibility('system.platform.windows'): platform = osWindows
-if xbmc.getCondVisibility('system.platform.linux'): platform = osLinux
-if xbmc.getCondVisibility('system.platform.osx'): platform = osOSX
-if xbmc.getCondVisibility('system.platform.android'): platform = osAndroid
-if xbmc.getCondVisibility('System.Platform.Linux.RaspberryPi'): platform = 0
+if xbmc.getCondVisibility('system.platform.windows'):
+    platform = osWindows
+if xbmc.getCondVisibility('system.platform.linux'):
+    platform = osLinux
+if xbmc.getCondVisibility('system.platform.osx'):
+    platform = osOSX
+if xbmc.getCondVisibility('system.platform.android'):
+    platform = osAndroid
+if xbmc.getCondVisibility('System.Platform.Linux.RaspberryPi'):
+    platform = 0
 
 hasExtRC = xbmc.getCondVisibility('System.HasAddon(script.chromium_remotecontrol)') == True
 useIntRC = addon.getSetting("remotectrl") == 'true'
 browser = int(addon.getSetting("browser"))
 verbLog = addon.getSetting('logging') == 'true'
 
-def PLAYVIDEO():
-    if not platform:
-        Dialog.notification(common.__plugin__, 'Betriebssytem wird von diesem Addon nicht unterstützt', xbmcgui.NOTIFICATION_ERROR)
-        return
-    amazonUrl = common.BASE_URL + "/dp/" + common.args.asin
-    waitsec = int(addon.getSetting("clickwait")) * 1000
-    pin = addon.getSetting("pin")
-    waitpin = int(addon.getSetting("waitpin")) * 1000
-    waitprepin = int(addon.getSetting("waitprepin")) * 1000
-    trailer = common.args.trailer
-    isAdult = int(common.args.adult)
-    pininput = addon.getSetting("pininput") == 'true'
-    fullscr = addon.getSetting("fullscreen") == 'true'
-    xbmc.Player().stop()
-
-    if trailer == '1':
-        videoUrl = amazonUrl + "/?autoplaytrailer=1"
-    else:
-        videoUrl = amazonUrl + "/?autoplay=1"
-
-    IStreamPlayback(amazonUrl, common.args.asin, trailer)
-
-def AndroidPlayback(asin, trailer):
-    manu = ''
-    if os.access('/system/bin/getprop', os.X_OK):
-        manu = check_output(['getprop', 'ro.product.manufacturer'])
-
-    if manu == 'Amazon':
-        cmp = 'com.amazon.avod/com.amazon.avod.playbackclient.EdPlaybackActivity'
-        pkg = 'com.fivecent.amazonvideowrapper'
-        act = ''
-        url = asin
-    else:
-        cmp = 'com.amazon.avod.thirdpartyclient/com.amazon.avod.thirdpartyclient.ThirdPartyPlaybackActivity'
-        pkg = 'com.amazon.avod.thirdpartyclient'
-        act = 'android.intent.action.VIEW'
-        url = common.BASE_URL + '/piv-apk-play?asin=' + asin
-        if trailer == '1': url += '&playTrailer=T'
-
-    subprocess.Popen(['log', '-p', 'v', '-t', 'Kodi-Amazon', 'Manufacturer: '+manu])
-    subprocess.Popen(['log', '-p', 'v', '-t', 'Kodi-Amazon', 'Starting App: %s Video: %s' % (pkg, url)])
-    common.Log('Manufacturer: %s' % manu)
-    common.Log('Starting App: %s Video: %s' % (pkg, url))
-    if verbLog:
-        if os.access('/system/xbin/su', os.X_OK) or os.access('/system/bin/su', os.X_OK):
-            common.Log('Logcat:\n' + check_output(['su', '-c', 'logcat -d | grep -i com.amazon.avod']))
-        common.Log('Properties:\n' + check_output(['sh', '-c', 'getprop | grep -iE "(ro.product|ro.build|google)"']))
-    xbmc.executebuiltin('StartAndroidActivity("%s", "%s", "", "%s")' % (pkg, act, url))
 
 def IStreamPlayback(url, asin, trailer):
     values = getFlashVars(url)
@@ -100,11 +57,14 @@ def IStreamPlayback(url, asin, trailer):
     listitem = xbmcgui.ListItem(path=mpd)
 
     if trailer == '1':
-        if title: listitem.setInfo('video', { 'Title': title + ' (Trailer)' })
-        if plot: listitem.setInfo('video', { 'Plot': plot })
+        if title:
+            listitem.setInfo('video', {'Title': title + ' (Trailer)'})
+        if plot:
+            listitem.setInfo('video', {'Plot': plot})
     listitem.setProperty('inputstream.mpd.license_type', 'com.widevine.alpha')
     listitem.setProperty('inputstream.mpd.license_key', licURL)
     xbmcplugin.setResolvedUrl(pluginhandle, True, listitem=listitem)
+
 
 def check_output(*popenargs, **kwargs):
     p = subprocess.Popen(stdout=subprocess.PIPE, stderr=subprocess.STDOUT, *popenargs, **kwargs)
@@ -118,6 +78,7 @@ def check_output(*popenargs, **kwargs):
             e.output = str(out) + str(err)
             common.Log(e, xbmc.LOGERROR)
     return out.strip()
+
 
 def getCmdLine(videoUrl, amazonUrl):
     scr_path = addon.getSetting("scr_path")
@@ -135,36 +96,45 @@ def getCmdLine(videoUrl, amazonUrl):
                  [(None, ['Mozilla Firefox\\firefox.exe'], ['firefox'], 'firefox'), '', '-profile ', ''],
                  [(None, ['Safari\\Safari.exe'], '', 'safari'), '', '', '']]
 
-    if not cust_br: br_path = ''
+    if not cust_br:
+        br_path = ''
 
     if platform != osOSX and not cust_br:
         for path in os_paths[platform]:
             for file in br_config[browser][0][platform]:
-                if os.path.exists(path+file):
+                if os.path.exists(path + file):
                     br_path = path + file
                     break
-                else: common.Log('Browser %s not found' % (path+file), xbmc.LOGDEBUG)
-            if br_path: break
+                else:
+                    common.Log('Browser %s not found' % (path + file), xbmc.LOGDEBUG)
+            if br_path:
+                break
 
-    if not os.path.exists(br_path) and platform != osOSX: return ''
+    if not os.path.exists(br_path) and platform != osOSX:
+        return ''
 
     br_args = br_config[browser][3]
-    if kiosk: br_args += br_config[browser][1]
+    if kiosk:
+        br_args += br_config[browser][1]
     if appdata and br_config[browser][2]:
         br_args += br_config[browser][2] + '"' + os.path.join(common.pldatapath, str(browser)) + '" '
 
     if platform == osOSX:
-        if not cust_br: br_path = os_paths[osOSX] + br_config[browser][0][osOSX]
-        if br_args.strip(): br_args = '--args ' + br_args
+        if not cust_br:
+            br_path = os_paths[osOSX] + br_config[browser][0][osOSX]
+        if br_args.strip():
+            br_args = '--args ' + br_args
 
     br_path += ' %s"%s"' % (br_args, videoUrl)
 
     return br_path
 
+
 def getStartupInfo():
     si = subprocess.STARTUPINFO()
     si.dwFlags = subprocess.STARTF_USESHOWWINDOW
     return si
+
 
 def getStreams(suc, data, retmpd=False):
     if not suc:
@@ -177,21 +147,26 @@ def getStreams(suc, data, retmpd=False):
 
     for cdn in data['audioVideoUrls']['avCdnUrlSets']:
         for urlset in cdn['avUrlInfoList']:
-            if retmpd: return title, plot, urlset['url']
+            if retmpd:
+                return title, plot, urlset['url']
             data = common.getURL(urlset['url'])
             fps_string = re.compile('frameRate="([^"]*)').findall(data)[0]
             fr = round(eval(fps_string + '.0'), 3)
-            return str(fr).replace('.0','')
+            return str(fr).replace('.0', '')
     return ''
 
+
 def getPlaybackInfo(url):
-    if addon.getSetting("framerate") == 'false': return ''
+    if addon.getSetting("framerate") == 'false':
+        return ''
     Dialog.notification(xbmc.getLocalizedString(20186), '', xbmcgui.NOTIFICATION_INFO, 60000, False)
     values = getFlashVars(url)
-    if not values: return ''
+    if not values:
+        return ''
     fr = getStreams(*getUrldata('catalog/GetPlaybackResources', values, extra=True))
     Dialog.notification(xbmc.getLocalizedString(20186), '', xbmcgui.NOTIFICATION_INFO, 10, False)
     return fr
+
 
 def getFlashVars(url):
     cookie = common.mechanizeLogin()
@@ -201,40 +176,42 @@ def getFlashVars(url):
         Dialog.notification(common.__plugin__, Error('CDP.InvalidRequest'), xbmcgui.NOTIFICATION_ERROR)
         return False
     values = {}
-    search = {'sessionID'  : "ue_sid='(.*?)'",
+    search = {'sessionID': "ue_sid='(.*?)'",
               'marketplace': "ue_mid='(.*?)'",
-              'customer'   : '"customerID":"(.*?)"'}
+              'customer': '"customerID":"(.*?)"'}
     if 'var config' in showpage:
-        flashVars = re.compile('var config = (.*?);',re.DOTALL).findall(showpage)
+        flashVars = re.compile('var config = (.*?);', re.DOTALL).findall(showpage)
         flashVars = json.loads(unicode(flashVars[0], errors='ignore'))
         values = flashVars['player']['fl_config']['initParams']
     else:
         for key, pattern in search.items():
             result = re.compile(pattern, re.DOTALL).findall(showpage)
-            if result: values[key] = result[0]
+            if result:
+                values[key] = result[0]
 
     for key in values.keys():
         if not values.has_key(key):
             Dialog.notification(common.getString(30200), common.getString(30210), xbmcgui.NOTIFICATION_ERROR)
             return False
 
-    values['deviceTypeID']  = 'AOAGZA014O5RE'
-    values['asin']          = common.args.asin
-    values['userAgent']     = common.UserAgent
-    values['deviceID']      = common.gen_id()
-    rand = 'onWebToken_' + str(random.randint(0,484))
+    values['deviceTypeID'] = 'AOAGZA014O5RE'
+    values['asin'] = common.args.asin
+    values['userAgent'] = common.UserAgent
+    values['deviceID'] = common.gen_id()
+    rand = 'onWebToken_' + str(random.randint(0, 484))
     pltoken = common.getURL(common.BASE_URL + "/gp/video/streaming/player-token.json?callback=" + rand, useCookie=cookie)
     try:
-        values['token']  = re.compile('"([^"]*).*"([^"]*)"').findall(pltoken)[0][1]
+        values['token'] = re.compile('"([^"]*).*"([^"]*)"').findall(pltoken)[0][1]
     except:
         Dialog.notification(common.getString(30200), common.getString(30201), xbmcgui.NOTIFICATION_ERROR)
         return False
     return values
 
+
 def getUrldata(mode, values, format='json', devicetypeid=False, version=1, firmware='1', opt='', extra=False, useCookie=False, retURL=False, vMT='Feature', dRes='AudioVideoUrls%2CCatalogMetadata'):
     if not devicetypeid:
         devicetypeid = values['deviceTypeID']
-    url  = common.ATV_URL + '/cdp/' + mode
+    url = common.ATV_URL + '/cdp/' + mode
     url += '?asin=' + values['asin']
     url += '&deviceTypeID=' + devicetypeid
     url += '&firmware=' + firmware
@@ -260,9 +237,10 @@ def getUrldata(mode, values, format='json', devicetypeid=False, version=1, firmw
         return True, jsondata
     return False, 'HTTP Fehler'
 
+
 def Error(data):
     code = data['errorCode']
-    common.Log('%s (%s) ' %(data['message'], code), xbmc.LOGERROR)
+    common.Log('%s (%s) ' % (data['message'], code), xbmc.LOGERROR)
     if 'CDP.InvalidRequest' in code:
         return common.getString(30204)
     elif 'CDP.Playback.NoAvailableStreams' in code:
@@ -274,9 +252,11 @@ def Error(data):
     elif 'CDP.Playback.TemporarilyUnavailable' in code:
         return common.getString(30208)
     else:
-        return '%s (%s) ' %(data['message'], code)
+        return '%s (%s) ' % (data['message'], code)
+
 
 class window(xbmcgui.WindowDialog):
+
     def __init__(self):
         xbmcgui.WindowDialog.__init__(self)
         self._stopEvent = threading.Event()
@@ -290,7 +270,8 @@ class window(xbmcgui.WindowDialog):
                 xbmc.executebuiltin("playercontrol(wakeup)")
             if process:
                 process.poll()
-                if process.returncode != None: self.close()
+                if process.returncode != None:
+                    self.close()
             self._stopEvent.wait(1)
 
     def wait(self, process):
@@ -311,10 +292,12 @@ class window(xbmcgui.WindowDialog):
 
         if pBTime > vidDur * 0.9 and not watched:
             xbmc.executebuiltin("Action(ToggleWatched)")
-            if not isLast: xbmc.executebuiltin("Action(Up)")
+            if not isLast:
+                xbmc.executebuiltin("Action(Up)")
 
     def onAction(self, action):
-        if not useIntRC: return
+        if not useIntRC:
+            return
 
         ACTION_SELECT_ITEM = 7
         ACTION_PARENT_DIR = 9
@@ -344,19 +327,19 @@ class window(xbmcgui.WindowDialog):
             Input(keys='{EX}')
         elif action in [ACTION_SELECT_ITEM, ACTION_PLAYER_PLAY, ACTION_PAUSE]:
             Input(keys='{SPC}')
-        elif action==ACTION_MOVE_LEFT:
+        elif action == ACTION_MOVE_LEFT:
             Input(keys='{LFT}')
-        elif action==ACTION_MOVE_RIGHT:
+        elif action == ACTION_MOVE_RIGHT:
             Input(keys='{RGT}')
-        elif action==ACTION_MOVE_UP:
+        elif action == ACTION_MOVE_UP:
             Input(keys='{U}')
-        elif action==ACTION_MOVE_DOWN:
+        elif action == ACTION_MOVE_DOWN:
             Input(keys='{DWN}')
-        elif action==ACTION_SHOW_INFO:
-            Input(9999,0)
+        elif action == ACTION_SHOW_INFO:
+            Input(9999, 0)
             xbmc.sleep(800)
-            Input(9999,-1)
+            Input(9999, -1)
         # numkeys for pin input
         elif actionId > 57 and actionId < 68:
-            strKey = str(actionId-58)
+            strKey = str(actionId - 58)
             Input(keys=strKey)

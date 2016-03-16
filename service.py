@@ -23,7 +23,7 @@ if __name__ == '__main__':
     checkfreq = 5000
     idleupdate = 300
     startidle = 0
-    
+
     if (not freq == '') and (not freq == '0'):
         while not xbmc.abortRequested:
             today = datetime.today()
@@ -31,18 +31,24 @@ if __name__ == '__main__':
             last = addon.getSetting('last_update')
             time = addon.getSetting('update_time')
             update = addon.getSetting('update_running')
-            if last == '': last = '1970-01-01'
-            if time == '': time = '00:00'
-            if freq == '0': break
+            if last == '':
+                last = '1970-01-01'
+            if time == '':
+                time = '00:00'
+            if freq == '0':
+                break
             dt = last + ' ' + time
             dtlast = datetime.strptime(dt, '%Y-%m-%d %H:%M')
             freqdays = [0, 1, 2, 5, 7][int(freq)]
             lastidle = xbmc.getGlobalIdleTime()
-            if xbmc.Player().isPlaying(): startidle = lastidle
-            if lastidle < startidle: startidle = 0
+            if xbmc.Player().isPlaying():
+                startidle = lastidle
+            if lastidle < startidle:
+                startidle = 0
             idletime = lastidle - startidle
-            if addon.getSetting('wait_idle') != 'true': idletime = idleupdate
-            
+            if addon.getSetting('wait_idle') != 'true':
+                idletime = idleupdate
+
             if dtlast + timedelta(days=freqdays) <= today and idletime >= idleupdate:
                 if update == 'false':
                     xbmc.log('AmazonDB: Starting DBUpdate (%s / %s)' % (dtlast, today))
