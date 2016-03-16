@@ -41,9 +41,9 @@ na = 'not available'
 selectLanguage = addon.getSetting("selectLanguage")
 siteVersion = addon.getSetting("siteVersion")
 siteVersionsList = ["com", "co.uk", "de", "jp"]
-siteVersion = siteVersionsList[int(siteVersion)]
 apiMain = ["atv-ps", "atv-ps-eu", "atv-ps-eu"][int(siteVersion)]
 marketplaceId = ["ATVPDKIKX0DER", "A1F83G8C2ARO7P", "A1PA6795UKMFR9", "A1VC38T7YXB528"][int(siteVersion)]
+siteVersion = siteVersionsList[int(siteVersion)]
 urlMainS = "https://www.amazon." + siteVersion
 urlMain = "http://www.amazon." + siteVersion
 
