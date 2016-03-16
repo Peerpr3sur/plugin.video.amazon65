@@ -57,6 +57,13 @@ class _Info:
         self.__dict__.update(kwargs)
 
 
+def prettyprint(string):
+    log(json.dumps(string,
+                   sort_keys=True,
+                   indent=4,
+                   separators=(',', ': ')))
+
+
 def getURL(url, host=BASE_URL.split('//')[1], useCookie=False, silent=False, headers=None):
     cj = cookielib.LWPCookieJar()
     if useCookie:

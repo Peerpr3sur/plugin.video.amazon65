@@ -148,6 +148,7 @@ def getStreams(suc, data, retmpd=False):
         return ''
 
     title = plot = False
+    common.prettyprint(data)
     if data.has_key('catalogMetadata'):
         title = data['catalogMetadata']['catalog']['title']
         plot = data['catalogMetadata']['catalog']['synopsis']
