@@ -51,7 +51,7 @@ winid = xbmcgui.getCurrentWindowId()
 verbLog = addon.getSetting('logging') == 'true'
 kodi_mjver = int(xbmc.getInfoLabel('System.BuildVersion')[0:2])
 Dialog = xbmcgui.Dialog()
-    
+
 class _Info:
     def __init__( self, *args, **kwargs ):
         self.__dict__.update( kwargs )
@@ -106,14 +106,14 @@ def WriteLog(data, fn='', mode='a'):
     file.write(data)
     file.write('\n')
     file.close()
-    
+
 def Log(msg, level=xbmc.LOGNOTICE):
     if level == xbmc.LOGDEBUG and verbLog: level = xbmc.LOGNOTICE
     if type(msg) == type(unicode()):
         msg = msg.encode('utf-8')
     WriteLog(msg)
     xbmc.log('[%s] %s' % (__plugin__, msg.__str__()), level)
-    
+
 def SaveFile(path, data):
     file = open(path,'w')
     file.write(data)
@@ -138,7 +138,7 @@ def addDir(name, mode, sitemode, url='', thumb='', fanart='', infoLabels=False, 
     item=xbmcgui.ListItem(name, iconImage="DefaultFolder.png", thumbnailImage=thumb)
     item.setProperty('fanart_image',fanart)
     item.setProperty('IsPlayable', 'false')
-    try: 
+    try:
         item.setProperty('TotalSeasons', str(infoLabels['TotalSeasons']))
     except: pass
     if infoLabels:
@@ -157,14 +157,12 @@ def addVideo(name,asin,poster=False,fanart=False,infoLabels=False,totalItems=0,c
         liz=xbmcgui.ListItem(name)
     if fanart == '' or fanart == None or fanart == na: fanart = def_fanart
     liz.setProperty('fanart_image',fanart)
-    
-    if int(addon.getSetting("playmethod")) == 3: liz.setProperty('IsPlayable', 'true')
-    else: liz.setProperty('IsPlayable', 'false')
-    
+    liz.setProperty('IsPlayable', 'true')
+
     if not cm:
         cm = []
     cm.insert(0, (getString(30101), 'Action(ToggleWatched)') )
-    
+
     if isHD:
         liz.addStreamInfo('video', { 'width':1920 ,'height' : 1080 })
     else:
@@ -177,7 +175,7 @@ def addVideo(name,asin,poster=False,fanart=False,infoLabels=False,totalItems=0,c
     else: liz.setArt({'poster': poster})
     liz.setInfo(type='Video', infoLabels=infoLabels)
     liz.addContextMenuItems( cm , replaceItems=False )
-    xbmcplugin.addDirectoryItem(handle=pluginhandle,url=u,listitem=liz,isFolder=False,totalItems=totalItems)     
+    xbmcplugin.addDirectoryItem(handle=pluginhandle,url=u,listitem=liz,isFolder=False,totalItems=totalItems)
 
 def addText(name):
     item = xbmcgui.ListItem(name)
@@ -189,7 +187,7 @@ def toogleWatchlist(asin=False, action='add'):
         asin=args.asin
         if args.remove == '1': action = 'remove'
         else: action = 'add'
-        
+
     cookie = mechanizeLogin()
     token = getToken(asin, cookie)
     url = BASE_URL + '/gp/video/watchlist/ajax/addRemove.html?ASIN=%s&dataType=json&token=%s&action=%s' % (asin, token, action)
@@ -208,7 +206,7 @@ def getToken(asin, cookie):
 
 def gen_id():
     guid = addon.getSetting("GenDeviceID")
-    if not guid or len(guid) != 56: 
+    if not guid or len(guid) != 56:
         guid = hmac.new(UserAgent, uuid.uuid4().bytes, hashlib.sha224).hexdigest()
         addon.setSetting("GenDeviceID", guid)
     return guid
@@ -235,7 +233,7 @@ def dologin():
     email = addon.getSetting('login_name')
     password = decode(addon.getSetting('login_pass'))
     changed = False
-    
+
     if addon.getSetting('save_login') == 'false' or email == '' or password == '':
         keyboard = xbmc.Keyboard(addon.getSetting('login_name'), getString(30002))
         keyboard.doModal()
@@ -247,14 +245,14 @@ def dologin():
         if os.path.isfile(COOKIEFILE):
             os.remove(COOKIEFILE)
         cj = cookielib.LWPCookieJar()
-        br = mechanize.Browser()  
+        br = mechanize.Browser()
         br.set_handle_robots(False)
         br.set_cookiejar(cj)
         #br.set_debug_http(True)
         #br.set_debug_responses(True)
-        br.addheaders = [('User-agent', UserAgent)]  
-        sign_in = br.open(BASE_URL + "/gp/aw/si.html") 
-        br.select_form(name="signIn")  
+        br.addheaders = [('User-agent', UserAgent)]
+        sign_in = br.open(BASE_URL + "/gp/aw/si.html")
+        br.select_form(name="signIn")
         br["email"] = email
         br["password"] = password
         logged_in = br.submit()
@@ -271,7 +269,7 @@ def dologin():
             gen_id()
             return cj
     return True
-    
+
 def setLoginPW():
     keyboard = xbmc.Keyboard('', getString(30003), True)
     keyboard.doModal()
@@ -279,7 +277,7 @@ def setLoginPW():
         password = keyboard.getText()
         return password
     return False
-        
+
 def encode(data):
     k = triple_des((str(uuid.getnode())*2)[0:24], CBC, "\0\0\0\0\0\0\0\0", padmode=PAD_PKCS5)
     d = k.encrypt(data)
@@ -290,7 +288,7 @@ def decode(data):
     k = triple_des((str(uuid.getnode())*2)[0:24], CBC, "\0\0\0\0\0\0\0\0", padmode=PAD_PKCS5)
     d = k.decrypt(base64.b64decode(data))
     return d
-    
+
 def cleanData(data):
     if type(data) == type(str()) or type(data) == type(unicode()):
         if data.replace('-','').strip() == '': data = ''
@@ -298,7 +296,7 @@ def cleanData(data):
         data = data.strip()
         if data == '': data = None
     return data
-    
+
 def cleanName(name, file=True):
     if file:
         notallowed = ['<', '>', ':', '"', '\\', '/', '|', '*', '?']
@@ -309,7 +307,7 @@ def cleanName(name, file=True):
     for c in notallowed:
         name = name.replace(c,'')
     return name
-    
+
 def GET_ASINS(content):
     asins = ''
     hd_key = False
@@ -344,7 +342,7 @@ def GET_ASINS(content):
     """
     del content
     return asins, hd_key, prime_key, channels
-    
+
 def SCRAP_ASINS(url):
     asins = []
     url = BASE_URL + url + '?ie=UTF8&sortBy=DATE_ADDED_DESC'
@@ -353,7 +351,7 @@ def SCRAP_ASINS(url):
         asins += re.compile('data-asin="(.+?)"', re.DOTALL).findall(content)
         return asins
     return []
-    
+
 def getString(id, enc=False):
     if enc: return addon.getLocalizedString(id).encode('utf-8')
     return addon.getLocalizedString(id)
@@ -368,7 +366,7 @@ def checkCase(title):
         title = title.title().replace('[Ov]', '[OV]').replace('Bc', 'BC')
     title = title.replace('[dt./OV]', '')
     return title
-    
+
 def getCategories():
     import urlparse
     response = getURL(ATV_URL + '/cdp/catalog/GetCategoryList?firmware=fmw:15-app:1.1.23&deviceTypeID=A1MPSLFC7L5AFK&deviceID=%s&format=json&OfferGroups=B0043YVHMY&IncludeAll=T&version=2' % addon.getSetting("GenDeviceID"))
@@ -396,7 +394,7 @@ def getCategories():
     return asins
 
 def SetView(content, view=False, updateListing=False):
-    # 501-POSTER WRAP 503-MLIST3 504=MLIST2 508-FANARTPOSTER 
+    # 501-POSTER WRAP 503-MLIST3 504=MLIST2 508-FANARTPOSTER
     confluence_views = [500,501,502,503,504,508,-1]
     xbmcplugin.setContent(pluginhandle, content)
     viewenable = addon.getSetting("viewenable")
@@ -407,7 +405,7 @@ def SetView(content, view=False, updateListing=False):
         if kodi_mjver >= 14: xbmc.executebuiltin('ActivateWindow(%s)' % winid)
         xbmc.executebuiltin('Container.SetViewMode(%s)' % viewid)
     xbmcplugin.endOfDirectory(pluginhandle,updateListing=updateListing)
-    
+
 def compasin(list, searchstring):
     ret = False
     for index, array in enumerate(list):
@@ -415,7 +413,7 @@ def compasin(list, searchstring):
             list[index][1] = 1
             ret = True
     return ret, list
-    
+
 def waitforDB(database):
     if database == 'tv':
         import tv
@@ -460,7 +458,7 @@ def getTypes(items, col):
                 if strdata not in list:
                     list.append(strdata)
     return list
-    
+
 def updateRunning():
     from datetime import datetime, timedelta
     update = addon.getSetting('update_running')
@@ -473,7 +471,7 @@ def updateRunning():
             Log('DB Update already running', xbmc.LOGDEBUG)
             return True
     return False
-            
+
 def copyDB(ask=False):
     import shutil
     if ask:
@@ -486,17 +484,17 @@ def copyDB(ask=False):
     movies.MovieDB.close()
     shutil.copy2(org_tvDBfile, tvDBfile)
     shutil.copy2(org_MovieDBfile, MovieDBfile)
-    
+
 org_tvDBfile = os.path.join(dbpath, 'tv.db')
 org_MovieDBfile = os.path.join(dbpath, 'movies.db')
-if addon.getSetting('customdbfolder') == 'true': 
+if addon.getSetting('customdbfolder') == 'true':
     dbpath = xbmc.translatePath(addon.getSetting('dbfolder')).decode('utf-8')
 tvDBfile = os.path.join(dbpath, 'tv.db')
 MovieDBfile = os.path.join(dbpath, 'movies.db')
 
 if addon.getSetting('customdbfolder') == 'true':
     if os.path.isfile(org_tvDBfile) and os.path.isfile(org_MovieDBfile):
-        if not os.path.isdir(dbpath): 
+        if not os.path.isdir(dbpath):
             os.makedirs(dbpath)
         if not os.path.isfile(tvDBfile) or not os.path.isfile(MovieDBfile):
             copyDB()

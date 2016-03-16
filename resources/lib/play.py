@@ -33,10 +33,9 @@ if xbmc.getCondVisibility('System.Platform.Linux.RaspberryPi'): platform = 0
 
 hasExtRC = xbmc.getCondVisibility('System.HasAddon(script.chromium_remotecontrol)') == True
 useIntRC = addon.getSetting("remotectrl") == 'true'
-playMethod = int(addon.getSetting("playmethod"))
 browser = int(addon.getSetting("browser"))
 verbLog = addon.getSetting('logging') == 'true'
- 
+
 def PLAYVIDEO():
     if not platform:
         Dialog.notification(common.__plugin__, 'Betriebssytem wird von diesem Addon nicht unterstützt', xbmcgui.NOTIFICATION_ERROR)
@@ -51,51 +50,13 @@ def PLAYVIDEO():
     pininput = addon.getSetting("pininput") == 'true'
     fullscr = addon.getSetting("fullscreen") == 'true'
     xbmc.Player().stop()
-    
+
     if trailer == '1':
         videoUrl = amazonUrl + "/?autoplaytrailer=1"
     else:
         videoUrl = amazonUrl + "/?autoplay=1"
 
-    if playMethod == 2 or platform == osAndroid:
-        AndroidPlayback(common.args.asin, trailer)
-    elif playMethod == 3:
-        IStreamPlayback(amazonUrl, common.args.asin, trailer)
-    else:
-        if common.verbLog: videoUrl += '&playerDebug=true'
-        url = getCmdLine(videoUrl, amazonUrl)
-        if not url:
-            Dialog.notification(common.__plugin__, common.getString(30198), xbmcgui.NOTIFICATION_ERROR)
-            addon.openSettings()
-            return
-        common.Log('Executing: %s' % url)
-        if platform == 1:
-            process = subprocess.Popen(url, startupinfo=getStartupInfo())
-        else:
-            process = subprocess.Popen(url, shell=True)
-        
-        if isAdult == 1 and pininput:
-            if fullscr: waitsec = waitsec*0.75
-            else: waitsec = waitprepin
-            xbmc.sleep(int(waitsec))
-            Input(keys=pin)
-            waitsec = waitpin
-    
-        if fullscr:
-            xbmc.sleep(int(waitsec))
-            if browser != 0:
-                Input(keys='f')
-            else:
-                Input(mousex=-1,mousey=350,click=2)
-                xbmc.sleep(500)
-                Input(mousex=9999,mousey=350)
-            
-        Input(mousex=9999,mousey=-1)
-    
-        if hasExtRC: return
-
-        myWindow = window()
-        myWindow.wait(process)
+    IStreamPlayback(amazonUrl, common.args.asin, trailer)
 
 def AndroidPlayback(asin, trailer):
     manu = ''
@@ -132,12 +93,12 @@ def IStreamPlayback(url, asin, trailer):
     vMT = 'Feature'
     if trailer == '1':
         vMT = 'Trailer'
-        
+
     title, plot, mpd = getStreams(*getUrldata('catalog/GetPlaybackResources', values, extra=True, vMT=vMT, opt='&titleDecorationScheme=primary-content'), retmpd=True)
     licURL = getUrldata('catalog/GetPlaybackResources', values, extra=True, vMT=vMT, dRes='Widevine2License', retURL=True)
     common.Log(mpd)
     listitem = xbmcgui.ListItem(path=mpd)
-    
+
     if trailer == '1':
         if title: listitem.setInfo('video', { 'Title': title + ' (Trailer)' })
         if plot: listitem.setInfo('video', { 'Plot': plot })
@@ -165,107 +126,46 @@ def getCmdLine(videoUrl, amazonUrl):
     kiosk = addon.getSetting("kiosk") == 'true'
     appdata = addon.getSetting("ownappdata") == 'true'
     cust_br = addon.getSetting("cust_path") == 'true'
-    
-    if playMethod == 1:
-        if not os.path.exists(scr_path): return ''
-        return scr_path + ' ' + scr_param.replace('{f}', getPlaybackInfo(amazonUrl)).replace('{u}', videoUrl)
-
     os_paths = [None, ('C:\\Program Files\\', 'C:\\Program Files (x86)\\'), ('/usr/bin/', '/usr/local/bin/'), 'open -a ']
     # path(0,win,lin,osx), kiosk, profile, args
 
-    br_config = [[(None, ['Internet Explorer\\iexplore.exe'], '', ''), '-k ', '', ''], 
+    br_config = [[(None, ['Internet Explorer\\iexplore.exe'], '', ''), '-k ', '', ''],
                  [(None, ['Google\\Chrome\\Application\\chrome.exe'], ['google-chrome', 'google-chrome-stable', 'google-chrome-beta', 'chromium-browser'], '"/Applications/Google Chrome.app"'),
                   '--kiosk ', '--user-data-dir=', '--start-maximized --disable-translate --disable-new-tab-first-run --no-default-browser-check --no-first-run '],
                  [(None, ['Mozilla Firefox\\firefox.exe'], ['firefox'], 'firefox'), '', '-profile ', ''],
                  [(None, ['Safari\\Safari.exe'], '', 'safari'), '', '', '']]
-    
+
     if not cust_br: br_path = ''
 
     if platform != osOSX and not cust_br:
         for path in os_paths[platform]:
             for file in br_config[browser][0][platform]:
-                if os.path.exists(path+file): 
+                if os.path.exists(path+file):
                     br_path = path + file
                     break
                 else: common.Log('Browser %s not found' % (path+file), xbmc.LOGDEBUG)
             if br_path: break
-                
+
     if not os.path.exists(br_path) and platform != osOSX: return ''
 
     br_args = br_config[browser][3]
     if kiosk: br_args += br_config[browser][1]
-    if appdata and br_config[browser][2]: 
+    if appdata and br_config[browser][2]:
         br_args += br_config[browser][2] + '"' + os.path.join(common.pldatapath, str(browser)) + '" '
-        
+
     if platform == osOSX:
         if not cust_br: br_path = os_paths[osOSX] + br_config[browser][0][osOSX]
         if br_args.strip(): br_args = '--args ' + br_args
-        
+
     br_path += ' %s"%s"' % (br_args, videoUrl)
-    
+
     return br_path
-
-def Input(mousex=0,mousey=0,click=0,keys=False,delay='200'):
-    screenWidth = int(xbmc.getInfoLabel('System.ScreenWidth'))
-    screenHeight = int(xbmc.getInfoLabel('System.ScreenHeight'))
-    keys_only = sc_only = keybd = ''
-    if mousex == -1: mousex = screenWidth/2
-    if mousey == -1: mousey = screenHeight/2
-
-    spec_keys = {'{EX}': ('!{F4}', 'control+shift+q', 'kd:cmd t:q ku:cmd'),
-                 '{SPC}': ('{SPACE}', 'space', 't:p'),
-                 '{LFT}': ('{LEFT}', 'Left', 'kp:arrow-left'),
-                 '{RGT}': ('{RIGHT}', 'Right', 'kp:arrow-right'),
-                 '{U}': ('{UP}', 'Up', 'kp:arrow-up'),
-                 '{DWN}': ('{DOWN}', 'Down', 'kp:arrow-down'),
-                 '{BACK}': ('{BS}', 'BackSpace', 'kp:delete'),
-                 '{RET}': ('{ENTER}', 'Return', 'kp:return')}
-                 
-    if keys:
-        keys_only = keys
-        for sc in spec_keys:
-            while sc in keys:
-                keys = keys.replace(sc, spec_keys[sc][platform-1]).strip()
-                keys_only = keys_only.replace(sc, '').strip()
-        sc_only = keys.replace(keys_only, '').strip()
-
-    if platform == osWindows:
-        app = os.path.join(common.pluginpath, 'tools', 'userinput.exe' )
-        mouse = ' mouse %s %s' % (mousex,mousey)
-        mclk = ' ' + str(click)
-        keybd = ' key %s %s' % (keys,delay)
-    elif platform == osLinux:
-        app = 'xdotool'
-        mouse = ' mousemove %s %s' % (mousex,mousey)
-        mclk = ' click --repeat %s 1' % click
-        if keys_only: keybd = ' type --delay %s %s' % (delay, keys_only)
-        if sc_only: 
-            if keybd: keybd += ' && ' + app
-            keybd += ' key ' + sc_only
-    elif platform == osOSX:
-        app = 'cliclick'
-        mouse = ' m:'
-        if click == 1: mouse = ' c:'
-        elif click == 2: mouse = ' dc:'
-        mouse += '%s,%s' % (mousex,mousey)
-        mclk = ''
-        keybd = ' -w %s' % delay
-        if keys_only: keybd += ' t:%s' % keys_only
-        if keys <> keys_only: keybd += ' ' + sc_only
-
-    if keys:
-        cmd = app + keybd
-    else:
-        cmd = app + mouse
-        if click: cmd += mclk
-    common.Log('Run command: %s' % cmd)
-    subprocess.call(cmd, shell=True)
 
 def getStartupInfo():
     si = subprocess.STARTUPINFO()
     si.dwFlags = subprocess.STARTF_USESHOWWINDOW
     return si
-    
+
 def getStreams(suc, data, retmpd=False):
     if not suc:
         return ''
@@ -274,7 +174,7 @@ def getStreams(suc, data, retmpd=False):
     if data.has_key('catalogMetadata'):
         title = data['catalogMetadata']['catalog']['title']
         plot = data['catalogMetadata']['catalog']['synopsis']
-        
+
     for cdn in data['audioVideoUrls']['avCdnUrlSets']:
         for urlset in cdn['avUrlInfoList']:
             if retmpd: return title, plot, urlset['url']
@@ -283,7 +183,7 @@ def getStreams(suc, data, retmpd=False):
             fr = round(eval(fps_string + '.0'), 3)
             return str(fr).replace('.0','')
     return ''
-    
+
 def getPlaybackInfo(url):
     if addon.getSetting("framerate") == 'false': return ''
     Dialog.notification(xbmc.getLocalizedString(20186), '', xbmcgui.NOTIFICATION_INFO, 60000, False)
@@ -312,7 +212,7 @@ def getFlashVars(url):
         for key, pattern in search.items():
             result = re.compile(pattern, re.DOTALL).findall(showpage)
             if result: values[key] = result[0]
-    
+
     for key in values.keys():
         if not values.has_key(key):
             Dialog.notification(common.getString(30200), common.getString(30210), xbmcgui.NOTIFICATION_ERROR)
@@ -330,7 +230,7 @@ def getFlashVars(url):
         Dialog.notification(common.getString(30200), common.getString(30201), xbmcgui.NOTIFICATION_ERROR)
         return False
     return values
-    
+
 def getUrldata(mode, values, format='json', devicetypeid=False, version=1, firmware='1', opt='', extra=False, useCookie=False, retURL=False, vMT='Feature', dRes='AudioVideoUrls%2CCatalogMetadata'):
     if not devicetypeid:
         devicetypeid = values['deviceTypeID']
@@ -375,13 +275,13 @@ def Error(data):
         return common.getString(30208)
     else:
         return '%s (%s) ' %(data['message'], code)
-        
+
 class window(xbmcgui.WindowDialog):
     def __init__(self):
         xbmcgui.WindowDialog.__init__(self)
         self._stopEvent = threading.Event()
         self._pbStart = time.time()
-        
+
     def _wakeUpThreadProc(self, process):
         starttime = time.time()
         while not self._stopEvent.is_set():
@@ -412,7 +312,7 @@ class window(xbmcgui.WindowDialog):
         if pBTime > vidDur * 0.9 and not watched:
             xbmc.executebuiltin("Action(ToggleWatched)")
             if not isLast: xbmc.executebuiltin("Action(Up)")
-            
+
     def onAction(self, action):
         if not useIntRC: return
 
