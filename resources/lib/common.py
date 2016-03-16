@@ -37,17 +37,28 @@ tvdb = base64.b64decode('MUQ2MkYyRjkwMDMwQzQ0NA==')
 COOKIEFILE = os.path.join(pldatapath, 'cookies.lwp')
 def_fanart = os.path.join(pluginpath, 'fanart.jpg')
 na = 'not available'
+
+selectLanguage = addon.getSetting("selectLanguage")
+siteVersion = addon.getSetting("siteVersion")
+siteVersionsList = ["com", "co.uk", "de", "jp"]
+siteVersion = siteVersionsList[int(siteVersion)]
+apiMain = ["atv-ps", "atv-ps-eu", "atv-ps-eu"][int(siteVersion)]
+marketplaceId = ["ATVPDKIKX0DER", "A1F83G8C2ARO7P", "A1PA6795UKMFR9", "A1VC38T7YXB528"][int(siteVersion)]
+urlMainS = "https://www.amazon." + siteVersion
+urlMain = "http://www.amazon." + siteVersion
+
+
 BASE_URL = 'https://www.amazon.de'
 ATV_URL = 'https://atv-eu.amazon.com'
+
 # ATV_URL = 'https://atv-ext-eu.amazon.com'
+
 UserAgent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2566.0 Safari/537.36'
 movielib = '/gp/video/%s/movie/'
 tvlib = '/gp/video/%s/tv/'
 lib = 'video-library'
 wl = 'watchlist'
-winid = xbmcgui.getCurrentWindowId()
 verbLog = addon.getSetting('logging') == 'true'
-kodi_mjver = int(xbmc.getInfoLabel('System.BuildVersion')[0:2])
 Dialog = xbmcgui.Dialog()
 
 

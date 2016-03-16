@@ -2,6 +2,7 @@
     <!-- General -->
     <category label="30011">
         <setting type="sep"/>
+        <setting id="siteVersion" type="enum" label="Select marketplace version" values="US|UK|DE" default="0"/>
         <setting id="browser" type="enum" label="Browser" values="Internet Explorer|Chrome|Firefox|Safari" default="0" visible="eq(-2,0)"/>
         <setting id="cust_path" type="bool" label="30043" default="" visible="eq(-3,0)" />
         <setting id="br_path" type="file" label="30062" default="" visible="eq(-4,0)" enable="eq(-1,true)" subsetting="true"/>
