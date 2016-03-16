@@ -57,6 +57,14 @@ class _Info:
         self.__dict__.update(kwargs)
 
 
+def log(txt):
+    if isinstance(txt, str):
+        txt = txt.decode("utf-8", 'ignore')
+    message = u'%s: %s' % (ADDON_ID, txt)
+    xbmc.log(msg=message.encode("utf-8", 'ignore'),
+             level=xbmc.LOGDEBUG)
+
+
 def prettyprint(string):
     log(json.dumps(string,
                    sort_keys=True,
