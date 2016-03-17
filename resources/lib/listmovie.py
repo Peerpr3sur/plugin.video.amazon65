@@ -76,37 +76,23 @@ def LIST_MOVIES(filter='',value=False,sortcol=False,sortaz=True,search=False,cmm
 
 def ADD_MOVIE_ITEM(moviedata, onlyinfo=False,cmmode=0, export=False):
     asin,hd_asin,movietitle,trailer,poster,plot,director,writer,runtime,year,premiered,studio,mpaa,actors,genres,stars,votes,fanart,isprime,isHD,isAdult,popularity,recent,audio = moviedata
-    infoLabels={'Title':movietitle}
-    if plot:
-        infoLabels['Plot'] = plot
-    if actors:
-        infoLabels['Cast'] = actors.split(',')
-    if director:
-        infoLabels['Director'] = director
-    if year:
-        infoLabels['Year'] = year
-    if premiered:
-        infoLabels['Premiered'] = premiered
-    if stars:
-        infoLabels['Rating'] = stars
-    if votes:
-        infoLabels['Votes'] = votes
-    if genres:
-        infoLabels['Genre'] = genres
-    if mpaa:
-        infoLabels['mpaa'] = mpaa
-    if studio:
-        infoLabels['Studio'] = studio
-    if runtime:
-        infoLabels['Duration'] = int(runtime)*60
-    if audio:
-        infoLabels['AudioChannels'] = audio
-    if poster:
-        infoLabels['Thumb'] = poster
-    if fanart:
-        infoLabels['Fanart'] = fanart
-    infoLabels['isHD'] = isHD
-    infoLabels['isAdult'] = isAdult
+    infoLabels={'Title':movietitle,
+                'Plot': plot,
+                'Cast': actors.split(',') if actors else [],
+                'Director': director,
+                'Year': year,
+                'Premiered': premiered,
+                'Rating': stars,
+                'Votes': votes,
+                'Genre': genres,
+                'mpaa': mpaa,
+                'Studio': studio,
+                'Duration': int(runtime)*60,
+                'AudioChannels': audio,
+                'Thumb': poster,
+                'Fanart': fanart,
+                'isHD': isHD,
+                'isAdult': isAdult}
     asin = asin.split(',')[0]
     cm = []
     cm.append((common.getString(30180+cmmode) % common.getString(30154), 'XBMC.RunPlugin(%s?mode=<common>&sitemode=<toogleWatchlist>&asin=<%s>&remove=<%s>)' % (sys.argv[0], asin, cmmode)))

@@ -200,23 +200,16 @@ def addDir(name, mode, sitemode, url='', thumb='', fanart='', infoLabels=False, 
     xbmcplugin.addDirectoryItem(handle=pluginhandle, url=u, listitem=item, isFolder=True, totalItems=totalItems)
 
 
-def addVideo(name, asin, poster=False, fanart=False, infoLabels=False, totalItems=0, cm=False, trailer=False, isAdult=False, isHD=False):
+def addVideo(name, asin, poster=False, fanart=False, infoLabels=False, totalItems=0, cm=[], trailer=False, isAdult=False, isHD=False):
     if not infoLabels:
         infoLabels = {"Title": name}
     u = '%s?asin=<%s>&mode=<play>&name=<%s>&sitemode=<PLAYVIDEO>&adult=<%s>' % (sys.argv[0], asin, urllib.quote_plus(name), str(isAdult))
-    if poster:
-        liz = xbmcgui.ListItem(name, thumbnailImage=poster)
-    else:
-        liz = xbmcgui.ListItem(name)
+    liz = xbmcgui.ListItem(name, thumbnailImage=poster if poster else "")
     if not fanart or fanart == na:
         fanart = def_fanart
     liz.setProperty('fanart_image', fanart)
     liz.setProperty('IsPlayable', 'true')
-
-    if not cm:
-        cm = []
     cm.insert(0, (getString(30101), 'Action(ToggleWatched)'))
-
     if isHD:
         liz.addStreamInfo('video', {'width': 1920, 'height': 1080})
     else:

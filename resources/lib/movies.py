@@ -127,9 +127,9 @@ def getMovieTypes(col):
     common.waitforDB('movie')
     c = MovieDB.cursor()
     items = c.execute('select distinct %s from movies' % col)
-    list = common.getTypes(items, col)
+    types = common.getTypes(items, col)
     c.close()
-    return list
+    return types
 
 
 def getMoviedbAsins(isPrime=1, list=False):
