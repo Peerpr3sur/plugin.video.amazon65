@@ -168,7 +168,7 @@ def androidsig(url):
     return base64.encodestring(sig.digest()).replace('\n', '')
 
 
-def addDir(name, mode, sitemode, url='', thumb='', fanart='', infoLabels=False, totalItems=0, cm=False, page=1, isHD=False, options=''):
+def addDir(name, mode, sitemode, url='', thumb='', fanart='', infoLabels=False, totalItems=0, cm=False, page=1, options=''):
     u = '%s?url=<%s>&mode=<%s>&sitemode=<%s>&name=<%s>&page=<%s>&opt=<%s>' % (sys.argv[0], urllib.quote_plus(url), mode, sitemode, urllib.quote_plus(name), urllib.quote_plus(str(page)), options)
     try:
         fanart = args.fanart
