@@ -138,7 +138,7 @@ def WriteLog(data, fn='', mode='a'):
         fn = '-' + fn
     fn = __plugin__ + fn + '.log'
     path = os.path.join(homepath, fn)
-    if type(data) == type(unicode()):
+    if type(data) == unicode:
         data = data.encode('utf-8')
     file = open(path, mode)
     data = time.strftime('[%d.%m/%H:%M:%S] ', time.localtime()) + data.__str__()
@@ -150,7 +150,7 @@ def WriteLog(data, fn='', mode='a'):
 def Log(msg, level=xbmc.LOGNOTICE):
     if level == xbmc.LOGDEBUG and verbLog:
         level = xbmc.LOGNOTICE
-    if type(msg) == type(unicode()):
+    if type(msg) == unicode:
         msg = msg.encode('utf-8')
     WriteLog(msg)
     xbmc.log('[%s] %s' % (__plugin__, msg.__str__()), level)
@@ -361,7 +361,7 @@ def decode(data):
 
 
 def cleanData(data):
-    if type(data) == type(str()) or type(data) == type(unicode()):
+    if type(data) == str or type(data) == unicode:
         if data.replace('-', '').strip() == '':
             data = ''
         data = data.replace(u'\u00A0', ' ').replace(u'\u2013', '-')
@@ -520,7 +520,7 @@ def getTypes(items, col):
     lowlist = []
     for data in items:
         data = data[0]
-        if type(data) == type(str()):
+        if type(data) == str:
             if 'Rated' in data:
                 item = data.split('for')[0]
                 if item not in list and item <> '' and item <> 0 and item <> 'Inc.' and item <> 'LLC.':
