@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from BeautifulSoup import BeautifulStoneSoup
-from BeautifulSoup import BeautifulSoup
 import common
 import appfeed
 import urlparse

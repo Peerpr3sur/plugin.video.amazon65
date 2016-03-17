@@ -6,9 +6,6 @@ import tv as tvDB
 import listtv
 import listmovie
 
-from BeautifulSoup import BeautifulStoneSoup
-from BeautifulSoup import BeautifulSoup , Tag, NavigableString
-
 pluginhandle = common.pluginhandle
 xbmc = common.xbmc
 xbmcplugin = common.xbmcplugin
