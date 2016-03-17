@@ -81,7 +81,7 @@ def ASIN_LOOKUP(ASINLIST):
               "IncludeAll": "T",
               "playbackInformationRequired": "true",
               "version": 2}
-    url = BUILD_BASE_API('catalog/GetASINDetails&') + urllib.urlencode(params)
+    url = BUILD_BASE_API('catalog/GetASINDetails') + "&" + urllib.urlencode(params)
     return json.loads(common.getATVURL(url))
 
 
