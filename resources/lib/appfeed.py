@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from BeautifulSoup import BeautifulSoup
-import datetime
 import common
 import listtv
 import listmovie
@@ -281,7 +280,8 @@ def updateAll():
     if common.updateRunning(): return
     import movies
     import tv
-    common.addon.setSetting('update_running', datetime.datetime.today().strftime('%Y-%m-%d %H:%M'))
+    from datetime import datetime
+    common.addon.setSetting('update_running', datetime.today().strftime('%Y-%m-%d %H:%M'))
     common.Log('Starting DBUpdate')
     Notif = xbmcgui.Dialog().notification
     Notif(common.__plugin__, common.getString(30106), sound = False)
@@ -292,7 +292,7 @@ def updateAll():
     movies.updateFanart()
     tv.setNewest(NewAsins)
     tv.updateFanart()
-    common.addon.setSetting('last_update', datetime.datetime.today().strftime('%Y-%m-%d'))
+    common.addon.setSetting('last_update', datetime.today().strftime('%Y-%m-%d'))
     common.addon.setSetting('update_running', 'false')
     Notif(common.__plugin__, common.getString(30126), sound = False)
     common.Log('DBUpdate finished')

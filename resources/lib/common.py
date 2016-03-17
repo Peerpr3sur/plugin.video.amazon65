@@ -19,8 +19,6 @@ import hmac
 import time
 import hashlib
 import json
-import datetime
-
 
 addon = xbmcaddon.Addon()
 __plugin__ = addon.getAddonInfo('name')
@@ -540,10 +538,11 @@ def getTypes(items, col):
 
 
 def updateRunning():
+    from datetime import datetime, timedelta
     update = addon.getSetting('update_running')
     if update != 'false':
-        starttime = datetime.datetime(*(time.strptime(update, '%Y-%m-%d %H:%M')[0:6]))
-        if (starttime + datetime.timedelta(hours=6)) <= datetime.datetime.today():
+        starttime = datetime(*(time.strptime(update, '%Y-%m-%d %H:%M')[0:6]))
+        if (starttime + timedelta(hours=6)) <= datetime.today():
             addon.setSetting('update_running', 'false')
             Log('DB Cancel update - duration > 6 hours')
         else:
