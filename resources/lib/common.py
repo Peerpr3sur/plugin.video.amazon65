@@ -186,7 +186,8 @@ def addDir(name, mode, sitemode, url='', thumb='', fanart='', infoLabels=False, 
     else:
         u += '&thumb=<%s>' % urllib.quote_plus(thumb)
     item = xbmcgui.ListItem(name, iconImage="DefaultFolder.png", thumbnailImage=thumb)
-    item.setProperty('fanart_image', fanart)
+    item.setArt({'fanart': fanart,
+                 'poster': thumb})
     item.setProperty('IsPlayable', 'false')
     try:
         item.setProperty('TotalSeasons', str(infoLabels['TotalSeasons']))
