@@ -23,7 +23,7 @@ def LIST_TV_ROOT():
     common.addDir(common.getString(30161),'listtv','LIST_TVSHOWS_TYPES','network')
     common.addDir(common.getString(30162),'listtv','LIST_TVSHOWS_TYPES','mpaa' )
     xbmcplugin.endOfDirectory(pluginhandle)
-    
+
 def LIST_TVSHOWS_CATS():
     import tv as tvDB
     id = common.args.url
@@ -45,8 +45,8 @@ def LIST_TVSHOWS_CATS():
     else:
         for title in tvDB.lookupTVdb('', name='asins', tbl='categories', single=False):
             if title: common.addDir(title[0],'listtv','LIST_TVSHOWS_CATS',title[0])
-        xbmcplugin.endOfDirectory(pluginhandle,updateListing=False)   
-        
+        xbmcplugin.endOfDirectory(pluginhandle,updateListing=False)
+
 def LIST_TVSHOWS_TYPES(type=False):
     import tv as tvDB
     if not type:
@@ -56,15 +56,15 @@ def LIST_TVSHOWS_TYPES(type=False):
         items = tvDB.getShowTypes(type)
     for item in items:
         common.addDir(item,'listtv',mode,type)
-    xbmcplugin.addSortMethod(pluginhandle, xbmcplugin.SORT_METHOD_LABEL)          
-    xbmcplugin.endOfDirectory(pluginhandle,updateListing=False)   
+    xbmcplugin.addSortMethod(pluginhandle, xbmcplugin.SORT_METHOD_LABEL)
+    xbmcplugin.endOfDirectory(pluginhandle,updateListing=False)
 
 def LIST_TVSHOWS_FILTERED():
     LIST_TVSHOWS(common.args.url, common.args.name)
 
 def LIST_TVSHOWS_SORTED():
     LIST_TVSHOWS(sortaz = False, sortcol = common.args.url)
-    
+
 def LIST_TVSHOWS(filter='',value=False,sortcol=False,sortaz=True,search=False,cmmode=0,export=False):
     import tv as tvDB
     if 'year' in filter: value = value.replace('0 -','')
@@ -96,11 +96,11 @@ def ADD_SHOW_ITEM(showdata,mode='listtv',submode='LIST_TV_SEASONS',cmmode=0,only
     if premiered:
         infoLabels['Premiered'] = premiered
     if stars:
-        infoLabels['Rating'] = stars           
+        infoLabels['Rating'] = stars
     if votes:
-        infoLabels['Votes'] = votes  
+        infoLabels['Votes'] = votes
     if genres:
-        infoLabels['Genre'] = genres 
+        infoLabels['Genre'] = genres
     if episodetotal:
         infoLabels['Episode'] = episodetotal
     if seasontotal:
@@ -117,12 +117,8 @@ def ADD_SHOW_ITEM(showdata,mode='listtv',submode='LIST_TV_SEASONS',cmmode=0,only
     infoLabels['Fanart'] = fanart
     infoLabels['Asins'] = asin
     asin = asin.split(',')[0]
-    if export:
-        xbmclibrary.EXPORT_SHOW(asin)
-        return
     cm = []
     cm.append((common.getString(30180+cmmode) % common.getString(30166), 'XBMC.RunPlugin(%s?mode=<common>&sitemode=<toogleWatchlist>&asin=<%s>&remove=<%s>)' % (sys.argv[0], asin, cmmode)))
-    cm.append((common.getString(30185) % common.getString(30166), 'XBMC.RunPlugin(%s?mode=<xbmclibrary>&sitemode=<EXPORT_SHOW>&asin=<%s>)' % (sys.argv[0], asin)))
     cm.append((common.getString(30183), 'Container.Update(%s?mode=<appfeed>&sitemode=<getSimilarities>&asin=<%s>)' % (sys.argv[0], asin)))
     cm.append((common.getString(30186), 'XBMC.RunPlugin(%s?mode=<xbmclibrary>&sitemode=<UpdateLibrary>)' % sys.argv[0]))
     cm.append((common.getString(30155) % common.getString(30166), 'XBMC.RunPlugin(%s?mode=<tv>&sitemode=<delfromTVdb>&asins=<%s>&table=<shows>&title=<%s>)' % ( sys.argv[0], urllib.quote_plus(infoLabels['Asins']), urllib.quote_plus(seriestitle))))
@@ -130,7 +126,7 @@ def ADD_SHOW_ITEM(showdata,mode='listtv',submode='LIST_TV_SEASONS',cmmode=0,only
         return infoLabels
     else:
         common.addDir(seriestitle,mode,submode,infoLabels['Asins'],poster,fanart,infoLabels,isHD=isHD,cm=cm)
-   
+
 def LIST_TV_SEASONS(seasons=False):
     seriesasin = common.args.url
     import tv as tvDB
@@ -148,7 +144,7 @@ def LIST_TVSEASON_SORTED(seasons=False, cmmode=0):
     for seasondata in seasons:
         ADD_SEASON_ITEM(seasondata, disptitle=True, cmmode=cmmode)
     common.SetView('tvshows', 'seasonview')
-        
+
 def ADD_SEASON_ITEM(seasondata, mode='listtv', submode='LIST_EPISODES_DB', disptitle=False, cmmode=0, onlyinfo=False, export=False):
     asin,seriesASIN,season,seriestitle,plot,actors,network,mpaa,genres,premiered,year,stars,votes,episodetotal,audio,empty,empty,isHD,isprime,empty,poster,banner,fanart = seasondata
     infoLabels={'Title': seriestitle,'TVShowTitle':seriestitle}
@@ -163,11 +159,11 @@ def ADD_SEASON_ITEM(seasondata, mode='listtv', submode='LIST_EPISODES_DB', dispt
     if premiered:
         infoLabels['Premiered'] = premiered
     if stars:
-        infoLabels['Rating'] = stars           
+        infoLabels['Rating'] = stars
     if votes:
-        infoLabels['Votes'] = votes  
+        infoLabels['Votes'] = votes
     if genres:
-        infoLabels['Genre'] = genres 
+        infoLabels['Genre'] = genres
     if episodetotal:
         infoLabels['Episode'] = episodetotal
     if season:
@@ -181,19 +177,15 @@ def ADD_SEASON_ITEM(seasondata, mode='listtv', submode='LIST_EPISODES_DB', dispt
     if season != 0 and len(str(season)) < 3: displayname += common.getString(30167, True) + ' ' + str(season)
     elif len(str(season)) > 2: displayname += common.getString(30168, True) + str(season)
     else: displayname += common.getString(30169, True)
-    if showfanart == 'true': 
+    if showfanart == 'true':
         fanart, cover = getFanart(seriesASIN)
     infoLabels['TotalSeasons'] = 1
     infoLabels['Thumb'] = poster
     infoLabels['Fanart'] = fanart
     infoLabels['Asins'] = asin
     asin = asin.split(',')[0]
-    if export:
-        xbmclibrary.EXPORT_SEASON(asin)
-        return
     cm = []
     cm.append((common.getString(30180+cmmode) % common.getString(30167), 'XBMC.RunPlugin(%s?mode=<common>&sitemode=<toogleWatchlist>&asin=<%s>&remove=<%s>)' % (sys.argv[0], asin, cmmode)))
-    cm.append((common.getString(30185) % common.getString(30167), 'XBMC.RunPlugin(%s?mode=<xbmclibrary>&sitemode=<EXPORT_SEASON>&asin=<%s>)' % (sys.argv[0], asin)))
     cm.append((common.getString(30183), 'Container.Update(%s?mode=<appfeed>&sitemode=<getSimilarities>&asin=<%s>)' % (sys.argv[0], asin)))
     cm.append((common.getString(30186), 'XBMC.RunPlugin(%s?mode=<xbmclibrary>&sitemode=<UpdateLibrary>)' % sys.argv[0]))
     cm.append((common.getString(30155) % common.getString(30167), 'XBMC.RunPlugin(%s?mode=<tv>&sitemode=<delfromTVdb>&asins=<%s>&table=<seasons>&title=<%s>)' % ( sys.argv[0], urllib.quote_plus(infoLabels['Asins']), urllib.quote_plus(displayname))))
@@ -212,7 +204,7 @@ def LIST_EPISODES_DB(owned=False, url=False):
             ADD_EPISODE_ITEM(episodedata)
     xbmcplugin.addSortMethod(pluginhandle, xbmcplugin.SORT_METHOD_LABEL)
     common.SetView('episodes', 'episodeview')
-        
+
 def ADD_EPISODE_ITEM(episodedata, onlyinfo=False, export=False):
     asin,seasonASIN,seriesASIN,seriestitle,season,episode,poster,mpaa,actors,genres,episodetitle,network,stars,votes,fanart,plot,airdate,year,runtime,isHD,isprime,isAdult,audio = episodedata
     infoLabels={'Title': episodetitle,'TVShowTitle':seriestitle,
@@ -220,7 +212,7 @@ def ADD_EPISODE_ITEM(episodedata, onlyinfo=False, export=False):
     if plot:
         infoLabels['Plot'] = plot
     if airdate:
-        infoLabels['Premiered'] = airdate 
+        infoLabels['Premiered'] = airdate
     if year:
         infoLabels['Year'] = year
     if runtime:
@@ -230,20 +222,20 @@ def ADD_EPISODE_ITEM(episodedata, onlyinfo=False, export=False):
     if actors:
         infoLabels['Cast'] = actors.split(',')
     if stars:
-        infoLabels['Rating'] = stars           
+        infoLabels['Rating'] = stars
     if votes:
-        infoLabels['Votes'] = votes  
+        infoLabels['Votes'] = votes
     if genres:
-        infoLabels['Genre'] = genres 
+        infoLabels['Genre'] = genres
     if network:
         infoLabels['Studio'] = network
     if audio:
         infoLabels['AudioChannels'] = audio
 
-    displayname = str(episode) + ' - ' + episodetitle 
+    displayname = str(episode) + ' - ' + episodetitle
     displayname = displayname.replace('"','')
     tvfanart, tvposter = getFanart(seriesASIN)
-    if showfanart == 'true': 
+    if showfanart == 'true':
         fanart = tvfanart
     infoLabels['Fanart'] = fanart
     infoLabels['Thumb'] = poster
@@ -253,18 +245,14 @@ def ADD_EPISODE_ITEM(episodedata, onlyinfo=False, export=False):
     infoLabels['isAdult'] = isAdult
     infoLabels['seriesASIN'] = seriesASIN
     asin = asin.split(',')[0]
-    if export:
-        xbmclibrary.EXPORT_EPISODE(asin)
-        return
     cm = []
-    cm.append((common.getString(30185) % common.getString(30173), 'XBMC.RunPlugin(%s?mode=<xbmclibrary>&sitemode=<EXPORT_EPISODE>&asin=<%s>)' % (sys.argv[0], asin)))
     cm.append((common.getString(30183), 'Container.Update(%s?mode=<appfeed>&sitemode=<getSimilarities>&asin=<%s>)' % (sys.argv[0], asin)))
     cm.append((common.getString(30186), 'XBMC.RunPlugin(%s?mode=<xbmclibrary>&sitemode=<UpdateLibrary>)' % sys.argv[0]))
     if onlyinfo:
         return infoLabels
     else:
         common.addVideo(displayname,asin,poster,fanart,infoLabels=infoLabels,isAdult=isAdult,isHD=isHD,cm=cm)
-        
+
 def getFanart(asin):
     import tv
     fanart, poster = tv.lookupTVdb(asin, rvalue='fanart, poster', tbl='shows')

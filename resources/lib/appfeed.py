@@ -24,20 +24,20 @@ os = common.os
 # 'catalog/GetSearchSuggestions'
 # 'catalog/GetASINDetails'
 # 'catalog/GetSimilarities'
-# 
+#
 # 'catalog/GetStreamingUrls'
 # 'catalog/GetStreamingTrailerUrls'
 # 'catalog/GetContentUrls'
-# 
+#
 # 'library/GetLibrary'
 # 'library/Purchase'
 # 'library/GetRecentPurchases'
-# 
+#
 # 'link/LinkDevice'
 # 'link/UnlinkDevice'
 # 'link/RegisterClient'
 # 'licensing/Release'
-# 
+#
 # 'usage/UpdateStream'
 # 'usage/ReportLogEvent'
 # 'usage/ReportEvent'
@@ -63,7 +63,7 @@ def BUILD_BASE_API(MODE,HOST=common.ATV_URL + '/cdp/'):
 def getList(ContentType=False,start=0,isPrime=True,NumberOfResults=False,OrderBy='MostPopular',version=2,AsinList=False,catalog='Browse',asin=False):
     BROWSE_PARAMS ='&StartIndex='+str(start)
     if NumberOfResults: BROWSE_PARAMS +='&NumberOfResults='+str(NumberOfResults)
-    if ContentType: 
+    if ContentType:
         BROWSE_PARAMS +='&ContentType='+ContentType
         BROWSE_PARAMS +='&OrderBy='+OrderBy
     BROWSE_PARAMS +='&IncludeAll=T'
@@ -75,7 +75,7 @@ def getList(ContentType=False,start=0,isPrime=True,NumberOfResults=False,OrderBy
         BROWSE_PARAMS +='&IncludeBlackList=T'
     if AsinList: BROWSE_PARAMS +='&SeasonASIN='+AsinList
     if asin: BROWSE_PARAMS +='&asin='+asin
-    BROWSE_PARAMS +='&version='+str(version)    
+    BROWSE_PARAMS +='&version='+str(version)
     #&HighDef=F # T or F ??
     #&playbackInformationRequired=false
     #&OrderBy=SalesRank
@@ -113,10 +113,10 @@ def SEARCH_DB(searchString=False):
                 common.SetView('tvshows', 'showview')
 
 def ExportList():
-    list = common.args.url
-    ListCont(common.movielib % list)
-    ListCont(common.tvlib % list)
-    
+    list_ = common.args.url
+    ListCont(common.movielib % list_)
+    ListCont(common.tvlib % list_)
+
 def getSimilarities():
     import tv
     data = getList(NumberOfResults=250,catalog='GetSimilarities',asin=common.args.asin)
@@ -128,9 +128,9 @@ def getSimilarities():
     common.SetView('tvshows', 'showview')
 
 def ListMenu():
-    list = common.args.url
-    common.addDir(common.getString(30104), 'appfeed', 'ListCont', common.movielib % list)
-    common.addDir(common.getString(30107), 'appfeed', 'ListCont', common.tvlib % list)
+    list_ = common.args.url
+    common.addDir(common.getString(30104), 'appfeed', 'ListCont', common.movielib % list_)
+    common.addDir(common.getString(30107), 'appfeed', 'ListCont', common.tvlib % list_)
     common.xbmcplugin.endOfDirectory(common.pluginhandle)
 
 def ListCont(export=False):
@@ -181,7 +181,7 @@ def RefreshList():
     tvlist = []
     pDialog = xbmcgui.DialogProgress()
     pDialog.create(common.__plugin__, common.getString(30117))
-    
+
     for asin in common.SCRAP_ASINS(common.movielib % list):
         if not movies.lookupMoviedb(asin): mvlist.append(asin)
 
@@ -191,7 +191,7 @@ def RefreshList():
     if mvlist: movies.updateLibrary(mvlist)
     if tvlist: tv.addTVdb(False, tvlist)
     pDialog.close()
-    
+
     if mvlist: movies.updateFanart()
     if tvlist: tv.updateFanart()
 
@@ -276,7 +276,7 @@ def getTMDBImages(title, imdb=None, content='movie', year=None):
     if content == 'movie' and id and not fanart:
         fanart = common.na
     return fanart
-    
+
 def updateAll():
     if common.updateRunning(): return
     import movies
