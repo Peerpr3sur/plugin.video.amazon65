@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+f#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from BeautifulSoup import BeautifulSoup
 import common
@@ -42,9 +42,8 @@ deviceID = common.gen_id()
 
 firmware = 'fmw:15-app:1.1.19'  # Android
 deviceTypeID = 'A1MPSLFC7L5AFK'
-format = 'json'
 
-PARAMETERS = '?firmware=' + firmware + '&deviceTypeID=' + deviceTypeID + '&deviceID=' + deviceID + '&format=' + format
+PARAMETERS = '?firmware=' + firmware + '&deviceTypeID=' + deviceTypeID + '&deviceID=' + deviceID + '&format=json'
 
 
 def BUILD_BASE_API(MODE, HOST=common.ATV_URL + '/cdp/'):

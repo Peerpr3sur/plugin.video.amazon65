@@ -1,29 +1,24 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import common
-import movies as moviesDB
-import tv as tvDB
-import listtv
-import listmovie
 
-pluginhandle = common.pluginhandle
-xbmc = common.xbmc
-xbmcplugin = common.xbmcplugin
-urllib = common.urllib
-sys = common.sys
-xbmcgui = common.xbmcgui
-os = common.os
+import xbmc
+import xbmcgui
+import os
+
 Dialog = xbmcgui.Dialog()
 
 if (common.addon.getSetting('enablelibraryfolder') == 'true'):
-    MOVIE_PATH = os.path.join(xbmc.translatePath(common.addon.getSetting('customlibraryfolder')),'Movies').decode('utf-8')
-    TV_SHOWS_PATH = os.path.join(xbmc.translatePath(common.addon.getSetting('customlibraryfolder')),'TV').decode('utf-8')
+    MOVIE_PATH = os.path.join(xbmc.translatePath(common.addon.getSetting('customlibraryfolder')), 'Movies').decode('utf-8')
+    TV_SHOWS_PATH = os.path.join(xbmc.translatePath(common.addon.getSetting('customlibraryfolder')), 'TV').decode('utf-8')
 else:
-    MOVIE_PATH = os.path.join(common.pldatapath,'Movies')
-    TV_SHOWS_PATH = os.path.join(common.pldatapath,'TV')
+    MOVIE_PATH = os.path.join(common.pldatapath, 'Movies')
+    TV_SHOWS_PATH = os.path.join(common.pldatapath, 'TV')
+
 
 def UpdateLibrary():
     xbmc.executebuiltin('UpdateLibrary(video)')
+
 
 def SaveFile(filename, data, dir=False):
     if dir:
@@ -37,18 +32,18 @@ def SaveFile(filename, data, dir=False):
 
 def streamDetails(Info, language='ger', hasSubtitles=False):
     skip_keys = ('ishd', 'isadult', 'audiochannels', 'genre', 'cast', 'duration', 'trailer', 'asins')
-    fileinfo  = '<runtime>%s</runtime>' % Info['Duration']
-    if Info.has_key('Genre'):
+    fileinfo = '<runtime>%s</runtime>' % Info['Duration']
+    if "Genre" in Info:
         for genre in Info['Genre'].split('/'):
             fileinfo += '<genre>%s</genre>' % genre.strip()
-    if Info.has_key('Cast'):
+    if "Cast" in Info:
         for actor in Info['Cast']:
             fileinfo += '<actor>'
             fileinfo += '<name>%s</name>' % actor.strip()
             fileinfo += '</actor>'
     for key, value in Info.items():
         lkey = key.lower()
-        if lkey == 'premiered' and Info.has_key('TVShowTitle'):
+        if lkey == 'premiered' and "TVShowTitle" in Info:
             fileinfo += '<aired>%s</aired>' % value
         elif lkey == 'fanart':
             fileinfo += '<%s><thumb>%s</thumb></%s>' % (lkey, value, lkey)
@@ -63,7 +58,7 @@ def streamDetails(Info, language='ger', hasSubtitles=False):
     fileinfo += '<video>'
     fileinfo += '<codec>h264</codec>'
     fileinfo += '<durationinseconds>%s</durationinseconds>' % Info['Duration']
-    if Info['isHD'] == True:
+    if Info['isHD']:
         fileinfo += '<height>720</height>'
         fileinfo += '<width>1280</width>'
     else:
@@ -72,7 +67,7 @@ def streamDetails(Info, language='ger', hasSubtitles=False):
     fileinfo += '<language>%s</language>' % language
     fileinfo += '<scantype>Progressive</scantype>'
     fileinfo += '</video>'
-    if hasSubtitles == True:
+    if hasSubtitles:
         fileinfo += '<subtitle>'
         fileinfo += '<language>ger</language>'
         fileinfo += '</subtitle>'

@@ -340,7 +340,6 @@ def deleteremoved(asins, refresh=True):
 
 
 def cleanDB():
-    c = tvDB.cursor()
     episodeasins = getTVdbAsins('episodes', 2, value='seasonasin')
     removeAsins = []
     for asins, season in lookupTVdb('', rvalue='asin, season', tbl='seasons', name='asin', single=False):
@@ -715,7 +714,8 @@ def updateFanart():
 
 
 def getIMDbID(asins, title):
-    url = id = None
+    url = None
+    imdb_id = None
     c = tvDB.cursor()
     for asin in asins.split(','):
         asin = '%' + asin + '%'
@@ -724,11 +724,11 @@ def getIMDbID(asins, title):
             url = url[0]
             break
     if not url:
-        while not id:
+        while not imdb_id:
             response = common.getURL('http://www.omdbapi.com/?type=series&t=' + urllib.quote_plus(title))
             data = json.loads(response)
             if data['Response'] == 'True':
-                id = data['imdbID']
+                imdb_id = data['imdbID']
             else:
                 oldtitle = title
                 if title.count(' - '):
@@ -738,11 +738,11 @@ def getIMDbID(asins, title):
                 elif title.count('?'):
                     title = title.replace('?', '')
                 if title == oldtitle:
-                    id = common.na
+                    imdb_id = common.na
     else:
-        id = re.compile('/title/(.+?)/', re.DOTALL).findall(url)
-    common.Log(id + asins.split(',')[0])
-    return id
+        imdb_id = re.compile('/title/(.+?)/', re.DOTALL).findall(url)
+    common.Log(imdb_id + asins.split(',')[0])
+    return imdb_id
 
 
 def setNewest(compList=False):

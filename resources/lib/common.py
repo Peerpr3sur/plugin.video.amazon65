@@ -383,25 +383,25 @@ def GET_ASINS(content):
     hd_key = False
     prime_key = False
     channels = 1
-    if content.has_key('titleId'):
+    if "titleId" in content:
         asins += content['titleId']
         titleId = content['titleId']
-    for format in content['formats']:
+    for format_ in content['formats']:
         hasprime = False
-        for offer in format['offers']:
+        for offer in format_['offers']:
             if offer['offerType'] == 'SUBSCRIPTION':
                 hasprime = True
                 prime_key = True
-            elif offer.has_key('asin'):
+            elif "asin" in offer:
                 newasin = offer['asin']
-                if format['videoFormatType'] == 'HD':
+                if format_['videoFormatType'] == 'HD':
                     if (newasin == titleId) and (hasprime):
                         hd_key = True
                 if newasin not in asins:
                     asins += ',' + newasin
-        if 'STEREO' in format['audioFormatTypes']:
+        if 'STEREO' in format_['audioFormatTypes']:
             channels = 2
-        if 'AC_3_5_1' in format['audioFormatTypes']:
+        if 'AC_3_5_1' in format_['audioFormatTypes']:
             channels = 6
     """
     if content['childTitles']:
@@ -510,15 +510,15 @@ def waitforDB(database):
 
 
 def getTypes(items, col):
-    list = []
+    types = []
     lowlist = []
     for data in items:
         data = data[0]
         if type(data) == str:
             if 'Rated' in data:
                 item = data.split('for')[0]
-                if item not in list and item <> '' and item <> 0 and item <> 'Inc.' and item <> 'LLC.':
-                    list.append(item)
+                if item and item not in types and item != 'Inc.' and item != 'LLC.':
+                    types.append(item)
             else:
                 if 'genres' in col:
                     data = data.split('/')
@@ -526,15 +526,15 @@ def getTypes(items, col):
                     data = re.split(r'[,;/]', data)
                 for item in data:
                     item = item.strip()
-                    if item.lower() not in lowlist and item <> '' and item <> 0 and item <> 'Inc.' and item <> 'LLC.':
-                        list.append(item)
+                    if item and item.lower() not in lowlist and item != 'Inc.' and item != 'LLC.':
+                        types.append(item)
                         lowlist.append(item.lower())
-        elif data <> 0:
+        elif data != 0:
             if data is not None:
                 strdata = str(data)[0:-1] + '0 -'
-                if strdata not in list:
-                    list.append(strdata)
-    return list
+                if strdata not in types:
+                    types.append(strdata)
+    return types
 
 
 def updateRunning():
