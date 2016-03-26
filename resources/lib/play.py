@@ -43,20 +43,6 @@ def PLAYVIDEO():
     IStreamPlayback(amazonUrl, common.args.asin, trailer)
 
 
-def check_output(*popenargs, **kwargs):
-    p = subprocess.Popen(stdout=subprocess.PIPE, stderr=subprocess.STDOUT, *popenargs, **kwargs)
-    out, err = p.communicate()
-    retcode = p.poll()
-    if retcode != 0:
-        c = kwargs.get("args")
-        if c is None:
-            c = popenargs[0]
-            e = subprocess.CalledProcessError(retcode, c)
-            e.output = str(out) + str(err)
-            common.Log(e, xbmc.LOGERROR)
-    return out.strip()
-
-
 def getStreams(suc, data, retmpd=False):
     if not suc:
         return ''
