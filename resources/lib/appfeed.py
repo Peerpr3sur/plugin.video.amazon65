@@ -6,12 +6,13 @@ import listtv
 import listmovie
 import xbmcgui
 import json
+import xbmc
+import urllib
+
 pluginhandle = common.pluginhandle
-xbmc = common.xbmc
-urllib = common.urllib
 
 # Modes
-#===============================================================================
+# ===============================================================================
 # 'catalog/GetCategoryList'
 # 'catalog/Browse'
 # 'catalog/Search'
@@ -38,12 +39,11 @@ urllib = common.urllib
 # 'usage/GetServerConfig'
 # ===============================================================================
 
-deviceID = common.gen_id()
-
-firmware = 'fmw:15-app:1.1.19'  # Android
-deviceTypeID = 'A1MPSLFC7L5AFK'
-
-PARAMETERS = '?firmware=' + firmware + '&deviceTypeID=' + deviceTypeID + '&deviceID=' + deviceID + '&format=json'
+PARAMETERS = {"firmware": common.FIRMWARE,
+              "deviceTypeID": common.DEVICETYPE_ID,
+              "deviceID": common.gen_id(),
+              "format": "json"}
+PARAMETERS = '?' + urllib.urlencode(PARAMETERS)
 
 
 def BUILD_BASE_API(MODE, HOST=common.ATV_URL + '/cdp/'):

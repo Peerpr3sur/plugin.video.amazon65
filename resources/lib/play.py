@@ -16,6 +16,7 @@ Dialog = xbmcgui.Dialog()
 pluginhandle = common.pluginhandle
 
 verbLog = addon.getSetting('logging') == 'true'
+DEVICETYPE_ID = 'AOAGZA014O5RE'
 
 
 def IStreamPlayback(url, asin, trailer):
@@ -57,15 +58,14 @@ def parseSubs(data):
         lang = sub['displayName'].split('(')[0].strip()
         common.Log('Convert %s Subtitle' % lang)
         file = xbmc.translatePath('special://temp/%s.srt' % lang).decode('utf-8')
-        srt = codecs.open(file, 'w', encoding='utf-8')
         soup = BeautifulSoup(common.getURL(sub['url']))
         enc = soup.originalEncoding
         num = 0
-        for caption in soup.findAll('tt:p'):
-            num += 1
-            subtext = caption.renderContents().decode(enc).replace('<tt:br>', '\n').replace('</tt:br>', '')
-            srt.write(u'%s\n%s --> %s\n%s\n\n' % (num, caption['begin'], caption['end'], subtext))
-        srt.close()
+        with codecs.open(file, 'w', encoding='utf-8') as srt:
+            for caption in soup.findAll('tt:p'):
+                num += 1
+                subtext = caption.renderContents().decode(enc).replace('<tt:br>', '\n').replace('</tt:br>', '')
+                srt.write(u'%s\n%s --> %s\n%s\n\n' % (num, caption['begin'], caption['end'], subtext))
         subs.append(file)
     return subs
 
@@ -138,7 +138,7 @@ def getFlashVars(url):
             Dialog.notification(common.getString(30200), common.getString(30210), xbmcgui.NOTIFICATION_ERROR)
             return False
 
-    values['deviceTypeID'] = 'AOAGZA014O5RE'
+    values['deviceTypeID'] = DEVICETYPE_ID
     values['asin'] = common.args.asin
     values['userAgent'] = common.UserAgent
     values['deviceID'] = common.gen_id()

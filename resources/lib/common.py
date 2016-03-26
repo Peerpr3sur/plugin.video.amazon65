@@ -58,7 +58,8 @@ BASE_URL = 'https://www.amazon.de'
 ATV_URL = 'https://atv-eu.amazon.com'
 
 # ATV_URL = 'https://atv-ext-eu.amazon.com'
-
+DEVICETYPE_ID = "A1MPSLFC7L5AFK"
+FIRMWARE = "fmw:15-app:1.1.23"
 UserAgent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2566.0 Safari/537.36'
 movielib = '/gp/video/%s/movie/'
 tvlib = '/gp/video/%s/tv/'
@@ -426,8 +427,8 @@ def checkCase(title):
 
 
 def getCategories():
-    params = {"firmware": "fmw:15-app:1.1.23",
-              "deviceTypeID": "A1MPSLFC7L5AFK",
+    params = {"firmware": FIRMWARE,
+              "deviceTypeID": DEVICETYPE_ID,
               "deviceID": addon.getSetting("GenDeviceID"),
               "format": "json",
               "OfferGroups": "B0043YVHMY",
