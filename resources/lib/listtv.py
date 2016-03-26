@@ -222,7 +222,6 @@ def ADD_EPISODE_ITEM(episodedata):
                   'Genre': genres,
                   'Studio': network,
                   'AudioChannels': audio,
-                  'Title': episodetitle,
                   'isAdult': isAdult,
                   'isHD': isHD,
                   'seriesASIN': seriesASIN,

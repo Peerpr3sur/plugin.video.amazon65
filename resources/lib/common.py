@@ -98,7 +98,6 @@ def getURL(url, host=BASE_URL.split('//')[1], useCookie=False, silent=False, hea
             cj = useCookie
         if isinstance(cj, bool):
             return False
-    dispurl = url
     dispurl = re.sub('(?i)%s|%s|&token=\w+' % (tvdb, tmdb), '', url).strip()
     if not silent:
         Log('getURL: ' + dispurl)
