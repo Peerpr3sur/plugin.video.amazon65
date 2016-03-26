@@ -92,7 +92,6 @@ def LIST_TVSHOWS(filter='', value=False, sortcol=False, sortaz=True, search=Fals
 def ADD_SHOW_ITEM(showdata, mode='listtv', submode='LIST_TV_SEASONS', cmmode=0, onlyinfo=False, export=False):
     asin, seriestitle, plot, network, mpaa, genres, actors, premiered, year, stars, votes, seasontotal, episodetotal, audio, isHD, isprime, empty, empty, empty, poster, banner, fanart = showdata
     infoLabels = {'Title': seriestitle,
-                  'TVShowTitle': seriestitle,
                   'Plot': plot,
                   'mediatype': "tvshow",
                   'MPAA': mpaa,

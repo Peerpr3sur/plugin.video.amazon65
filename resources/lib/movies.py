@@ -272,7 +272,6 @@ def updateFanart():
 
 
 def deleteremoved(asins):
-    c = MovieDB.cursor()
     delMovies = 0
     for item in asins:
         if item[1] == 0:
@@ -282,61 +281,44 @@ def deleteremoved(asins):
 
 
 def ASIN_ADD(title):
-    titelnum = 0
     isAdult = False
     stars = None
     votes = None
-    trailer = False
-    fanart = None
     poster = None
+    runtime = None
+    premiered = None
+    year = None
     asin, isHD, isPrime, audio = common.GET_ASINS(title)
     movietitle = title['title']
-    if 'synopsis' in title:
-        plot = title['synopsis']
-    else:
-        plot = None
-    if 'director' in title:
-        director = title['director']
-    else:
-        director = None
+    plot = title.get('synopsis')
+    fanart = title.get('heroUrl')
+    director = title.get('director')
     if 'runtime' in title:
         runtime = str(title['runtime']['valueMillis'] / 60000)
-    else:
-        runtime = None
-    if title.has_key('releaseOrFirstAiringDate'):
+    if 'releaseOrFirstAiringDate' in title:
         premiered = title['releaseOrFirstAiringDate']['valueFormatted'].split('T')[0]
         year = int(premiered.split('-')[0])
-    else:
-        premiered = None
-        year = None
-    if title.has_key('studioOrNetwork'):
-        studio = title['studioOrNetwork']
-    else:
-        studio = None
-    if title.has_key('regulatoryRating'):
+    studio = title.get('studioOrNetwork')
+    if 'regulatoryRating' in title:
         if title['regulatoryRating'] == 'not_checked':
             mpaa = common.getString(30171)
         else:
             mpaa = common.getString(30170) + title['regulatoryRating']
     else:
         mpaa = ''
-    if title.has_key('starringCast'):
-        actors = title['starringCast']
-    else:
-        actors = None
-    if title.has_key('genres'):
+    actors = title.get('starringCast')
+    if 'genres' in title:
         genres = ' / '.join(title['genres']).replace('_', ' & ').replace('Musikfilm & Tanz', 'Musikfilm, Tanz')
     else:
         genres = ''
-    if title.has_key('trailerAvailable'):
-        trailer = title['trailerAvailable']
-    if title.has_key('customerReviewCollection'):
+    trailer = title.get('trailerAvailable')
+    if 'customerReviewCollection' in title:
         stars = float(title['customerReviewCollection']['customerReviewSummary']['averageOverallRating']) * 2
         votes = str(title['customerReviewCollection']['customerReviewSummary']['totalReviewCount'])
-    elif title.has_key('amazonRating'):
-        if title['amazonRating'].has_key('rating'):
+    elif 'amazonRating' in title:
+        if 'rating' in title['amazonRating']:
             stars = float(title['amazonRating']['rating']) * 2
-        if title['amazonRating'].has_key('count'):
+        if 'count' in title['amazonRating']:
             votes = str(title['amazonRating']['count'])
     if 'restrictions' in title:
         for rest in title['restrictions']:
@@ -351,8 +333,7 @@ def ASIN_ADD(title):
             poster = thumbnailBase + thumbnailFilename.split('.')[0] + '.jpg'
         except:
             poster = None
-    if 'heroUrl' in title:
-        fanart = title['heroUrl']
+    titelnum = 0
     if 'bbl test' not in movietitle.lower() and 'test movie' not in movietitle.lower():
         moviedata = [common.cleanData(x) for x in [asin, None, common.checkCase(movietitle), trailer, poster, plot, director, None, runtime, year, premiered, studio, mpaa, actors, genres, stars, votes, fanart, isPrime, isHD, isAdult, None, None, audio]]
         titelnum += addMoviedb(moviedata)
