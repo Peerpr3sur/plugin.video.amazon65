@@ -81,6 +81,7 @@ def ADD_MOVIE_ITEM(moviedata, onlyinfo=False, cmmode=0, export=False):
     asin, hd_asin, movietitle, trailer, poster, plot, director, writer, runtime, year, premiered, studio, mpaa, actors, genres, stars, votes, fanart, isprime, isHD, isAdult, popularity, recent, audio = moviedata
     infoLabels = {'Title': movietitle,
                   'Plot': plot,
+                  'mediatype': "movie",
                   'Cast': actors.split(',') if actors else [],
                   'Director': director,
                   'Year': year,
