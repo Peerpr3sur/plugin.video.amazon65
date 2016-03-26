@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import common
-import pluginhandle
 import xbmcplugin
 import sys
 
@@ -19,7 +18,7 @@ def LIST_MOVIE_ROOT():
     common.addDir(common.getString(30158), 'listmovie', 'LIST_MOVIE_TYPES', 'actors')
     common.addDir(common.getString(30147), 'listmovie', 'LIST_MOVIE_TYPES', 'mpaa')
     common.addDir(common.getString(30148), 'listmovie', 'LIST_MOVIE_TYPES', 'director')
-    xbmcplugin.endOfDirectory(pluginhandle)
+    xbmcplugin.endOfDirectory(common.pluginhandle)
 
 
 def LIST_MOVIES_CATS():
@@ -34,7 +33,7 @@ def LIST_MOVIES_CATS():
         for title in moviesDB.lookupMoviedb('', name='asins', table='categories', single=False):
             if title:
                 common.addDir(title[0], 'listmovie', 'LIST_MOVIES_CATS', title[0])
-        xbmcplugin.endOfDirectory(pluginhandle, updateListing=False)
+        xbmcplugin.endOfDirectory(common.pluginhandle, updateListing=False)
 
 
 def LIST_MOVIE_TYPES(type=False):
@@ -45,8 +44,8 @@ def LIST_MOVIE_TYPES(type=False):
         mode = 'LIST_MOVIES_FILTERED'
     for item in moviesDB.getMovieTypes(type):
         common.addDir(item, 'listmovie', mode, type)
-    xbmcplugin.addSortMethod(pluginhandle, xbmcplugin.SORT_METHOD_LABEL)
-    xbmcplugin.endOfDirectory(pluginhandle, updateListing=False)
+    xbmcplugin.addSortMethod(common.pluginhandle, xbmcplugin.SORT_METHOD_LABEL)
+    xbmcplugin.endOfDirectory(common.pluginhandle, updateListing=False)
 
 
 def LIST_MOVIES_FILTERED():
@@ -69,12 +68,12 @@ def LIST_MOVIES(filter='', value=False, sortcol=False, sortaz=True, search=False
     if not search:
         if sortaz:
             if not 'year' in filter:
-                xbmcplugin.addSortMethod(pluginhandle, xbmcplugin.SORT_METHOD_VIDEO_TITLE)
-            xbmcplugin.addSortMethod(pluginhandle, xbmcplugin.SORT_METHOD_VIDEO_YEAR)
-            xbmcplugin.addSortMethod(pluginhandle, xbmcplugin.SORT_METHOD_VIDEO_RUNTIME)
-            xbmcplugin.addSortMethod(pluginhandle, xbmcplugin.SORT_METHOD_VIDEO_RATING)
-            xbmcplugin.addSortMethod(pluginhandle, xbmcplugin.SORT_METHOD_DURATION)
-            xbmcplugin.addSortMethod(pluginhandle, xbmcplugin.SORT_METHOD_STUDIO_IGNORE_THE)
+                xbmcplugin.addSortMethod(common.pluginhandle, xbmcplugin.SORT_METHOD_VIDEO_TITLE)
+            xbmcplugin.addSortMethod(common.pluginhandle, xbmcplugin.SORT_METHOD_VIDEO_YEAR)
+            xbmcplugin.addSortMethod(common.pluginhandle, xbmcplugin.SORT_METHOD_VIDEO_RUNTIME)
+            xbmcplugin.addSortMethod(common.pluginhandle, xbmcplugin.SORT_METHOD_VIDEO_RATING)
+            xbmcplugin.addSortMethod(common.pluginhandle, xbmcplugin.SORT_METHOD_DURATION)
+            xbmcplugin.addSortMethod(common.pluginhandle, xbmcplugin.SORT_METHOD_STUDIO_IGNORE_THE)
         common.SetView('movies', 'movieview')
     return count
 
