@@ -7,6 +7,7 @@ import mechanize
 import sys
 import urllib
 import urllib2
+import urlparse
 import re
 import os
 import xbmcplugin
@@ -138,14 +139,13 @@ def WriteLog(data, fn='', mode='a'):
     if fn:
         fn = '-' + fn
     fn = __plugin__ + fn + '.log'
-    path = os.path.join(homepath, fn)
     if type(data) == unicode:
         data = data.encode('utf-8')
-    file = open(path, mode)
     data = time.strftime('[%d.%m/%H:%M:%S] ', time.localtime()) + data.__str__()
-    file.write(data)
-    file.write('\n')
-    file.close()
+    path = os.path.join(homepath, fn)
+    with open(path, mode) as file:
+        file.write(data)
+        file.write('\n')
 
 
 def Log(msg, level=xbmc.LOGNOTICE):
@@ -422,30 +422,30 @@ def checkCase(title):
 
 
 def getCategories():
-    import urlparse
     response = getURL(ATV_URL + '/cdp/catalog/GetCategoryList?firmware=fmw:15-app:1.1.23&deviceTypeID=A1MPSLFC7L5AFK&deviceID=%s&format=json&OfferGroups=B0043YVHMY&IncludeAll=T&version=2' % addon.getSetting("GenDeviceID"))
     data = json.loads(response)
     asins = {}
     for maincat in data['message']['body']['categories']:
         mainCatId = maincat.get('id')
-        if mainCatId == 'movies' or mainCatId == 'tv_shows':
-            asins.update({mainCatId: {}})
-            for type in maincat['categories'][0]['categories']:
-                subPageType = type.get('subPageType')
-                subCatId = type.get('id')
-                if subPageType == 'PrimeMovieRecentlyAdded' or subPageType == 'PrimeTVRecentlyAdded':
-                    asins[mainCatId].update({subPageType: urlparse.parse_qs(type['query'])['ASINList'][0].split(',')})
-                elif 'prime_editors_picks' in subCatId:
-                    for picks in type['categories']:
-                        query = picks.get('query').upper()
-                        title = picks.get('title')
-                        if title and ('ASINLIST' in query):
-                            querylist = urlparse.parse_qs(query)
-                            alkey = None
-                            for key in querylist.keys():
-                                if 'ASINLIST' in key:
-                                    alkey = key
-                            asins[mainCatId].update({title: urlparse.parse_qs(query)[alkey][0]})
+        if mainCatId not in ['movies', 'tv_shows']:
+            continue
+        asins.update({mainCatId: {}})
+        for cat in maincat['categories'][0]['categories']:
+            subPageType = cat.get('subPageType')
+            subCatId = cat.get('id')
+            if subPageType == 'PrimeMovieRecentlyAdded' or subPageType == 'PrimeTVRecentlyAdded':
+                asins[mainCatId].update({subPageType: urlparse.parse_qs(cat['query'])['ASINList'][0].split(',')})
+            elif 'prime_editors_picks' in subCatId:
+                for picks in cat['categories']:
+                    query = picks.get('query').upper()
+                    title = picks.get('title')
+                    if title and ('ASINLIST' in query):
+                        querylist = urlparse.parse_qs(query)
+                        alkey = None
+                        for key in querylist.keys():
+                            if 'ASINLIST' in key:
+                                alkey = key
+                        asins[mainCatId].update({title: urlparse.parse_qs(query)[alkey][0]})
     return asins
 
 
