@@ -372,7 +372,7 @@ def GET_ASINS(content):
             elif "asin" in offer:
                 newasin = offer['asin']
                 if format_['videoFormatType'] == 'HD':
-                    if (newasin == titleId) and (hasprime):
+                    if (newasin == titleId) and hasprime:
                         hd_key = True
                 if newasin not in asins:
                     asins += ',' + newasin
@@ -423,7 +423,14 @@ def checkCase(title):
 
 
 def getCategories():
-    response = getURL(ATV_URL + '/cdp/catalog/GetCategoryList?firmware=fmw:15-app:1.1.23&deviceTypeID=A1MPSLFC7L5AFK&deviceID=%s&format=json&OfferGroups=B0043YVHMY&IncludeAll=T&version=2' % addon.getSetting("GenDeviceID"))
+    params = {"firmware": "fmw:15-app:1.1.23",
+              "deviceTypeID": "A1MPSLFC7L5AFK",
+              "deviceID": addon.getSetting("GenDeviceID"),
+              "format": "json",
+              "OfferGroups": "B0043YVHMY",
+              "IncludeAll": "T",
+              "version": 2}
+    response = getURL(ATV_URL + '/cdp/catalog/GetCategoryList?' + urllib.urlencode(params))
     data = json.loads(response)
     asins = {}
     for maincat in data['message']['body']['categories']:
