@@ -4,7 +4,7 @@
        version="1.0.0"
        provider-name="Sandmann79 + BlueCop + Romans I XVI + phil65">
   <requires>
-    <import addon="xbmc.python" version="2.1.0"/>
+    <import addon="xbmc.python" version="2.25.0"/>
     <import addon="script.module.beautifulsoup" version="3.2.1"/>
     <import addon="script.module.mechanize" version="0.2.6"/>
     <import addon="script.module.amazon.database" version="0.0.9"/>
