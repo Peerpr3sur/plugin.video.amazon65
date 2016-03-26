@@ -1,14 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import common
-
-pluginhandle = common.pluginhandle
-xbmc = common.xbmc
-xbmcplugin = common.xbmcplugin
-xbmcaddon = common.xbmcaddon
-urllib = common.urllib
-sys = common.sys
-xbmcgui = common.xbmcgui
+import pluginhandle
+import xbmcplugin
+import sys
 
 # Movie listing
 
