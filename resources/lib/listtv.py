@@ -91,31 +91,23 @@ def LIST_TVSHOWS(filter='', value=False, sortcol=False, sortaz=True, search=Fals
 
 def ADD_SHOW_ITEM(showdata, mode='listtv', submode='LIST_TV_SEASONS', cmmode=0, onlyinfo=False, export=False):
     asin, seriestitle, plot, network, mpaa, genres, actors, premiered, year, stars, votes, seasontotal, episodetotal, audio, isHD, isprime, empty, empty, empty, poster, banner, fanart = showdata
-    infoLabels = {'Title': seriestitle, 'TVShowTitle': seriestitle}
-    if plot:
-        infoLabels['Plot'] = plot
-    if mpaa:
-        infoLabels['MPAA'] = mpaa
-    if actors:
-        infoLabels['Cast'] = actors.split(',')
-    if year:
-        infoLabels['Year'] = year
-    if premiered:
-        infoLabels['Premiered'] = premiered
-    if stars:
-        infoLabels['Rating'] = stars
-    if votes:
-        infoLabels['Votes'] = votes
-    if genres:
-        infoLabels['Genre'] = genres
-    if episodetotal:
-        infoLabels['Episode'] = episodetotal
-    if seasontotal:
-        infoLabels['TotalSeasons'] = seasontotal
-    if network:
-        infoLabels['Studio'] = network
-    if audio:
-        infoLabels['AudioChannels'] = audio
+    infoLabels = {'Title': seriestitle,
+                  'TVShowTitle': seriestitle,
+                  'Plot': plot,
+                  'mediatype': "tvshow",
+                  'MPAA': mpaa,
+                  'Cast': actors.split(',') if actors else None,
+                  'Year': year,
+                  'Premiered': premiered,
+                  'Rating': stars,
+                  'Votes': votes,
+                  'Genre': genres,
+                  'Episode': episodetotal,
+                  'TotalSeasons': seasontotal,
+                  'Studio': network,
+                  'AudioChannels': audio
+                  }
+    infoLabels = {k: v for k, v in infoLabels.items() if v}
     if mode == 'listtv':
         submode = 'LIST_TV_SEASONS'
     if poster is None:
@@ -159,6 +151,7 @@ def ADD_SEASON_ITEM(seasondata, mode='listtv', submode='LIST_EPISODES_DB', dispt
     infoLabels = {'Title': seriestitle,
                   'TVShowTitle': seriestitle,
                   'Plot': plot,
+                  'mediatype': "season",
                   'MPAA': mpaa,
                   'Cast': actors.split(',') if actors else None,
                   'Year': year,
@@ -217,6 +210,7 @@ def ADD_EPISODE_ITEM(episodedata):
     infoLabels = {'Title': episodetitle,
                   'TVShowTitle': seriestitle,
                   'Episode': episode,
+                  'mediatype': "episode",
                   'Season': season,
                   'Plot': plot,
                   'Premiered': airdate,
