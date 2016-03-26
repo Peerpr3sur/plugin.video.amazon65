@@ -288,6 +288,8 @@ def ASIN_ADD(title):
     runtime = None
     premiered = None
     year = None
+    mpaa = ''
+    genres = ''
     asin, isHD, isPrime, audio = common.GET_ASINS(title)
     movietitle = title['title']
     plot = title.get('synopsis')
@@ -304,13 +306,9 @@ def ASIN_ADD(title):
             mpaa = common.getString(30171)
         else:
             mpaa = common.getString(30170) + title['regulatoryRating']
-    else:
-        mpaa = ''
     actors = title.get('starringCast')
     if 'genres' in title:
         genres = ' / '.join(title['genres']).replace('_', ' & ').replace('Musikfilm & Tanz', 'Musikfilm, Tanz')
-    else:
-        genres = ''
     trailer = title.get('trailerAvailable')
     if 'customerReviewCollection' in title:
         stars = float(title['customerReviewCollection']['customerReviewSummary']['averageOverallRating']) * 2
@@ -322,9 +320,9 @@ def ASIN_ADD(title):
             votes = str(title['amazonRating']['count'])
     if 'restrictions' in title:
         for rest in title['restrictions']:
-            if rest['action'] == 'playback':
-                if rest['type'] == 'ageVerificationRequired':
-                    isAdult = True
+            if rest['action'] == 'playback' and rest['type'] == 'ageVerificationRequired':
+                isAdult = True
+                break
     if 'images' in title['formats'][0]:
         thumbnailUrl = title['formats'][0]['images'][0]['uri']
         thumbnailFilename = thumbnailUrl.split('/')[-1]

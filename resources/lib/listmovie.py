@@ -55,7 +55,7 @@ def LIST_MOVIES_SORTED():
     LIST_MOVIES(sortaz=False, sortcol=common.args.url)
 
 
-def LIST_MOVIES(filter='', value=False, sortcol=False, sortaz=True, search=False, cmmode=0, export=False):
+def LIST_MOVIES(filter='', value=False, sortcol=False, sortaz=True, search=False, cmmode=0):
     import movies as moviesDB
     if 'year' in filter:
         value = value.replace('0 -', '')
@@ -63,7 +63,7 @@ def LIST_MOVIES(filter='', value=False, sortcol=False, sortaz=True, search=False
     count = 0
     for moviedata in movies:
         count += 1
-        ADD_MOVIE_ITEM(moviedata, cmmode=cmmode, export=export)
+        ADD_MOVIE_ITEM(moviedata, cmmode=cmmode)
     if not search:
         if sortaz:
             if 'year' not in filter:
@@ -77,7 +77,7 @@ def LIST_MOVIES(filter='', value=False, sortcol=False, sortaz=True, search=False
     return count
 
 
-def ADD_MOVIE_ITEM(moviedata, onlyinfo=False, cmmode=0, export=False):
+def ADD_MOVIE_ITEM(moviedata, cmmode=0):
     asin, hd_asin, movietitle, trailer, poster, plot, director, writer, runtime, year, premiered, studio, mpaa, actors, genres, stars, votes, fanart, isprime, isHD, isAdult, popularity, recent, audio = moviedata
     infoLabels = {'Title': movietitle,
                   'Plot': plot,
@@ -101,7 +101,4 @@ def ADD_MOVIE_ITEM(moviedata, onlyinfo=False, cmmode=0, export=False):
     cm = []
     cm.append((common.getString(30180 + cmmode) % common.getString(30154), 'XBMC.RunPlugin(%s?mode=<common>&sitemode=<toggleWatchlist>&asin=<%s>&remove=<%s>)' % (sys.argv[0], asin, cmmode)))
     cm.append((common.getString(30183), 'Container.Update(%s?mode=<appfeed>&sitemode=<getSimilarities>&asin=<%s>)' % (sys.argv[0], asin)))
-    if onlyinfo:
-        return infoLabels
-    else:
-        common.addVideo(movietitle, asin, poster, fanart, infoLabels=infoLabels, cm=cm, trailer=trailer, isAdult=isAdult, isHD=isHD)
+    common.addVideo(movietitle, asin, poster, fanart, infoLabels=infoLabels, cm=cm, trailer=trailer, isAdult=isAdult, isHD=isHD)
