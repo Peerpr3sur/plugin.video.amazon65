@@ -574,7 +574,7 @@ def ASIN_ADD(titles, asins=False, url=False, single=False):
     count = 0
     for title in titles:
         poster = plot = premiered = year = studio = mpaa = fanart = imdburl = None
-        actors = genres = stars = votes = seriesasin = runtime = banner = None
+        actors = genres = stars = votes = seriesasin = runtime = None
         seasontotal = episodetotal = episode = 0
         isAdult = False
         if asins:
@@ -583,7 +583,7 @@ def ASIN_ADD(titles, asins=False, url=False, single=False):
             contentType = title['contentType']
 
         asin, isHD, isPrime, audio = common.GET_ASINS(title)
-        if title['formats'][0].has_key('images'):
+        if 'images' in title['formats'][0]:
             try:
                 thumbnailUrl = title['formats'][0]['images'][0]['uri']
                 thumbnailFilename = thumbnailUrl.split('/')[-1]
@@ -591,36 +591,31 @@ def ASIN_ADD(titles, asins=False, url=False, single=False):
                 poster = thumbnailBase + thumbnailFilename.split('.')[0] + '.jpg'
             except:
                 pass
-        if title.has_key('synopsis'):
-            plot = title['synopsis']
-        if title.has_key('releaseOrFirstAiringDate'):
+        plot = title.get('synopsis')
+        if 'releaseOrFirstAiringDate' in title:
             premiered = title['releaseOrFirstAiringDate']['valueFormatted'].split('T')[0]
             year = int(premiered.split('-')[0])
-        if title.has_key('studioOrNetwork'):
-            studio = title['studioOrNetwork']
-        if title.has_key('regulatoryRating'):
+        studio = title.get('studioOrNetwork')
+        if 'regulatoryRating' in title:
             if title['regulatoryRating'] == 'not_checked':
                 mpaa = common.getString(30171)
             else:
                 mpaa = common.getString(30170) + title['regulatoryRating']
-        if title.has_key('starringCast'):
-            actors = title['starringCast']
-        if title.has_key('genres'):
+        actors = title.get('starringCast')
+        if 'genres' in title:
             genres = ' / '.join(title['genres']).replace('_', ' & ').replace('Musikfilm & Tanz', 'Musikfilm, Tanz')
-        if title.has_key('customerReviewCollection'):
+        if 'customerReviewCollection' in title:
             stars = float(title['customerReviewCollection']['customerReviewSummary']['averageOverallRating']) * 2
             votes = str(title['customerReviewCollection']['customerReviewSummary']['totalReviewCount'])
-        elif title.has_key('amazonRating'):
-            if title['amazonRating'].has_key('rating'):
+        elif 'amazonRating' in title:
+            if 'rating' in title['amazonRating']:
                 stars = float(title['amazonRating']['rating']) * 2
-            if title['amazonRating'].has_key('count'):
+            if 'count' in title['amazonRating']:
                 votes = str(title['amazonRating']['count'])
-        if title.has_key('heroUrl'):
-            fanart = title['heroUrl']
-
+        fanart = title.get('heroUrl')
         if contentType == 'SERIES':
             seriestitle = title['title']
-            if title.has_key('childTitles'):
+            if 'childTitles' in title:
                 seasontotal = title['childTitles'][0]['size']
             showdata = [common.cleanData(x) for x in [asin, common.checkCase(seriestitle), plot, studio, mpaa, genres, actors, premiered, year, stars, votes, seasontotal, 0, audio, isHD, isPrime, None, None, None, poster, None, fanart]]
             count += addDB('shows', showdata)
@@ -637,38 +632,31 @@ def ASIN_ADD(titles, asins=False, url=False, single=False):
             else:
                 seriesasin = asin.split(',')[0]
                 seriestitle = title['title']
-            if title.has_key('childTitles'):
+            if 'childTitles' in title:
                 episodetotal = title['childTitles'][0]['size']
             # if title.has_key('drakeUrl'):
             #    imdburl = title['drakeUrl']
-            if title.has_key('imdbUrl'):
-                imdburl = title['imdbUrl']
+            imdburl = title.get('imdbUrl')
             seasondata = [common.cleanData(x) for x in [asin, seriesasin, season, common.checkCase(seriestitle), plot, actors, studio, mpaa, genres, premiered, year, stars, votes, episodetotal, audio, None, None, isHD, isPrime, imdburl, poster, None, fanart]]
             count += addDB('seasons', seasondata)
         elif contentType == 'EPISODE':
             episodetitle = title['title']
-            if title.has_key('ancestorTitles'):
+            if 'ancestorTitles' in title:
                 for content in title['ancestorTitles']:
                     if content['contentType'] == 'SERIES':
-                        if content.has_key('titleId'):
-                            seriesasin = content['titleId']
-                        if content.has_key('title'):
-                            seriestitle = content['title']
+                        seriesasin = content.get('titleId')
+                        seriestitle = content.get('title')
                     elif content['contentType'] == 'SEASON':
-                        if content.has_key('number'):
-                            season = content['number']
-                        if content.has_key('titleId'):
-                            seasonasin = content['titleId']
-                        if content.has_key('title'):
-                            seasontitle = content['title']
+                        season = content.get('number')
+                        seasonasin = content.get('titleId')
+                        seasontitle = content.get('title')
                 if not seriesasin:
                     seriesasin = seasonasin
                     seriestitle = seasontitle
-            if title.has_key('number'):
-                episode = title['number']
-            if title.has_key('runtime'):
+            episode = title.get('number')
+            if 'runtime' in title:
                 runtime = str(title['runtime']['valueMillis'] / 60000)
-            if title.has_key('restrictions'):
+            if 'restrictions' in title:
                 for rest in title['restrictions']:
                     if rest['action'] == 'playback':
                         if rest['type'] == 'ageVerificationRequired':
@@ -681,7 +669,7 @@ def ASIN_ADD(titles, asins=False, url=False, single=False):
 def updateFanart():
     if tvdb_art == '0':
         return
-    asin = title = year = None
+    asin = title = None
     seasons = False
     c = tvDB.cursor()
     sqlstring = 'select asin, seriestitle, fanart, poster from shows where fanart is null'
