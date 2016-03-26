@@ -210,8 +210,10 @@ def LIST_EPISODES_DB(owned=False, url=False):
     common.SetView('episodes')
 
 
-def ADD_EPISODE_ITEM(episodedata, onlyinfo=False, export=False):
+def ADD_EPISODE_ITEM(episodedata):
     asin, seasonASIN, seriesASIN, seriestitle, season, episode, poster, mpaa, actors, genres, episodetitle, network, stars, votes, fanart, plot, airdate, year, runtime, isHD, isprime, isAdult, audio = episodedata
+    tvfanart, tvposter = getFanart(seriesASIN)
+    displayname = "{} - {}".format(episode, episodetitle).replace('"', '')
     infoLabels = {'Title': episodetitle,
                   'TVShowTitle': seriestitle,
                   'Episode': episode,
@@ -227,27 +229,20 @@ def ADD_EPISODE_ITEM(episodedata, onlyinfo=False, export=False):
                   'Genre': genres,
                   'Studio': network,
                   'AudioChannels': audio,
+                  'Title': episodetitle,
+                  'isAdult': isAdult,
+                  'isHD': isHD,
+                  'seriesASIN': seriesASIN,
                   }
     infoLabels = {k: v for k, v in infoLabels.items() if v}
-    displayname = str(episode) + ' - ' + episodetitle
-    displayname = displayname.replace('"', '')
-    tvfanart, tvposter = getFanart(seriesASIN)
     if showfanart == 'true':
         fanart = tvfanart
     infoLabels['Fanart'] = fanart
     infoLabels['Thumb'] = poster
     infoLabels['Poster'] = tvposter
-    infoLabels['Title'] = displayname
-    infoLabels['isHD'] = isHD
-    infoLabels['isAdult'] = isAdult
-    infoLabels['seriesASIN'] = seriesASIN
     asin = asin.split(',')[0]
-    cm = []
-    cm.append((common.getString(30183), 'Container.Update(%s?mode=<appfeed>&sitemode=<getSimilarities>&asin=<%s>)' % (sys.argv[0], asin)))
-    if onlyinfo:
-        return infoLabels
-    else:
-        common.addVideo(displayname, asin, poster, fanart, infoLabels=infoLabels, isAdult=isAdult, isHD=isHD, cm=cm)
+    cm = [(common.getString(30183), 'Container.Update(%s?mode=<appfeed>&sitemode=<getSimilarities>&asin=<%s>)' % (sys.argv[0], asin))]
+    common.addVideo(displayname, asin, poster, fanart, infoLabels=infoLabels, isAdult=isAdult, isHD=isHD, cm=cm)
 
 
 def getFanart(asin):
