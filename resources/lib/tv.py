@@ -301,11 +301,11 @@ def delfromTVdb():
     asins = common.args.asins
     title = common.args.title
     table = common.args.table
-    id = 30166
+    string_id = 30166
     if table == 'seasons':
-        id = 30167
+        string_id = 30167
 
-    if Dialog.yesno(common.getString(30155) % common.getString(id), common.getString(30156) % title.decode('utf-8')):
+    if Dialog.yesno(common.getString(30155) % common.getString(string_id), common.getString(30156) % title.decode('utf-8')):
         delasins = []
         if table == 'seasons':
             delasins.append(asins)
