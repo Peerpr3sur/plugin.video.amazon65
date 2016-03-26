@@ -436,18 +436,6 @@ msgstr ""
 
 #empty string with id 30139
 
-msgctxt "#30140"
-msgid "Export Favorited to Library"
-msgstr ""
-
-msgctxt "#30141"
-msgid "Favorited"
-msgstr ""
-
-msgctxt "#30142"
-msgid "Export All to Library"
-msgstr ""
-
 msgctxt "#30143"
 msgid "All Movies"
 msgstr ""
@@ -571,10 +559,6 @@ msgid "Get Similarities"
 msgstr ""
 
 #empty string with id 30184
-
-msgctxt "#30185"
-msgid "Export %s"
-msgstr ""
 
 msgctxt "#30186"
 msgid "Update Library"

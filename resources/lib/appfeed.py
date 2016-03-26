@@ -104,12 +104,6 @@ def SEARCH_DB(searchString=False):
                 common.SetView('tvshows')
 
 
-def ExportList():
-    list_ = common.args.url
-    ListCont(common.movielib % list_)
-    ListCont(common.tvlib % list_)
-
-
 def getSimilarities():
     import tv
     data = getList(NumberOfResults=250, catalog='GetSimilarities', asin=common.args.asin)
@@ -129,16 +123,12 @@ def ListMenu():
     common.xbmcplugin.endOfDirectory(common.pluginhandle)
 
 
-def ListCont(export=False):
+def ListCont():
     import tv
     mov = False
     showonly = False
     rvalue = 'distinct *'
-    if export:
-        url = export
-        export = True
-    else:
-        url = common.args.url
+    url = common.args.url
     if 'movie' in url:
         mov = True
     if common.addon.getSetting('disptvshow') == 'true':
@@ -153,28 +143,27 @@ def ListCont(export=False):
     for value in asins:
         ret = 0
         if mov:
-            ret = listmovie.LIST_MOVIES('asin', value, search=True, cmmode=1, export=export)
+            ret = listmovie.LIST_MOVIES('asin', value, search=True, cmmode=1)
         if ret == 0 and not mov:
             for seasondata in tv.lookupTVdb(value, tbl='seasons', rvalue=rvalue, single=False):
-                if seasondata:
-                    if showonly:
-                        ret = 0
-                        value = seasondata[0]
-                        for asin in tv.lookupTVdb(value, tbl='shows', rvalue='asin').split(','):
-                            if asin in asinlist:
-                                ret = 1
-                    else:
-                        ret = 1
-                        listtv.ADD_SEASON_ITEM(seasondata, disptitle=True, cmmode=1, export=export)
+                if not seasondata:
+                    continue
+                if showonly:
+                    ret = 0
+                    value = seasondata[0]
+                    for asin in tv.lookupTVdb(value, tbl='shows', rvalue='asin').split(','):
+                        if asin in asinlist:
+                            ret = 1
+                else:
+                    ret = 1
+                    listtv.ADD_SEASON_ITEM(seasondata, disptitle=True, cmmode=1)
         if ret == 0 and not mov:
-            listtv.LIST_TVSHOWS('asin', value, search=True, cmmode=1, export=export)
+            listtv.LIST_TVSHOWS('asin', value, search=True, cmmode=1)
         asinlist.append(value)
-
-    if not export:
-        if mov:
-            common.SetView('movies')
-        else:
-            common.SetView('tvshows')
+    if mov:
+        common.SetView('movies')
+    else:
+        common.SetView('tvshows')
 
 
 def RefreshList():

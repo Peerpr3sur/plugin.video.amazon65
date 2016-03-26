@@ -15,12 +15,8 @@ def modes():
     if sys.argv[2] == '':
         common.Log('Version: %s' % common.__version__)
         common.Log('Unicode support: %s' % common.os.path.supports_unicode_filenames)
-        cm_watchlist = [(common.getString(30185) % 'Watchlist',
-                         'XBMC.RunPlugin(%s?mode=<appfeed>&sitemode=<ExportList>&url=<%s>)' % (sys.argv[0], common.wl))]
-        cm_library = [(common.getString(30185) % common.getString(30060),
-                       'XBMC.RunPlugin(%s?mode=<appfeed>&sitemode=<ExportList>&url=<%s>)' % (sys.argv[0], common.lib)),
-                      (common.getString(30116),
-                       'XBMC.RunPlugin(%s?mode=<appfeed>&sitemode=<RefreshList>&url=<%s>)' % (sys.argv[0], common.lib))]
+        cm_watchlist = []
+        cm_library = [(common.getString(30116), 'XBMC.RunPlugin(%s?mode=<appfeed>&sitemode=<RefreshList>&url=<%s>)' % (sys.argv[0], common.lib))]
         common.addDir('Watchlist',
                       'appfeed',
                       'ListMenu',
