@@ -36,7 +36,7 @@ urllib = common.urllib
 # 'usage/ReportLogEvent'
 # 'usage/ReportEvent'
 # 'usage/GetServerConfig'
-#===============================================================================
+# ===============================================================================
 
 deviceID = common.gen_id()
 
@@ -92,7 +92,6 @@ def SEARCH_DB(searchString=False):
     if not searchString:
         keyboard = xbmc.Keyboard('')
         keyboard.doModal()
-        q = keyboard.getText()
         if (keyboard.isConfirmed()):
             searchString = keyboard.getText()
             if searchString != '':
@@ -181,17 +180,17 @@ def ListCont(export=False):
 def RefreshList():
     import tv
     import movies
-    list = common.args.url
+    list_ = common.args.url
     mvlist = []
     tvlist = []
     pDialog = xbmcgui.DialogProgress()
     pDialog.create(common.__plugin__, common.getString(30117))
 
-    for asin in common.SCRAP_ASINS(common.movielib % list):
+    for asin in common.SCRAP_ASINS(common.movielib % list_):
         if not movies.lookupMoviedb(asin):
             mvlist.append(asin)
 
-    for asin in common.SCRAP_ASINS(common.tvlib % list):
+    for asin in common.SCRAP_ASINS(common.tvlib % list_):
         if not tv.lookupTVdb(asin, tbl='seasons'):
             tvlist.append(asin)
 
@@ -251,9 +250,9 @@ def getTVDBImages(title, imdb=None, id=None, seasons=False):
             soup = BeautifulSoup(result)
             fanart = soup.find('fanart')
             poster = soup.find('poster')
-            if len(fanart) and not fanarturl:
+            if fanart and not fanarturl:
                 fanarturl = TVDB_URL + fanart.string
-            if len(poster) and not posterurl:
+            if poster and not posterurl:
                 posterurl = TVDB_URL + poster.string
             if posterurl and fanarturl:
                 return id, posterurl, fanarturl
@@ -261,15 +260,13 @@ def getTVDBImages(title, imdb=None, id=None, seasons=False):
 
 
 def getTMDBImages(title, imdb=None, content='movie', year=None):
-    fanart = poster = id = None
+    fanart = id = None
     splitter = [' - ', ': ', ', ']
     TMDB_URL = 'http://image.tmdb.org/t/p/original'
     yearorg = year
 
     while not id:
-        str_year = ''
-        if year:
-            str_year = '&year=' + str(year)
+        str_year = '&year=' + str(year) if year else ""
         movie = urllib.quote_plus(title)
         result = common.getURL('http://api.themoviedb.org/3/search/%s?api_key=%s&language=de&query=%s%s' % (content, common.tmdb, movie, str_year), silent=True)
         if not result:
@@ -281,8 +278,6 @@ def getTMDBImages(title, imdb=None, content='movie', year=None):
             result = data['results'][0]
             if result['backdrop_path']:
                 fanart = TMDB_URL + result['backdrop_path']
-            if result['poster_path']:
-                poster = TMDB_URL + result['poster_path']
             id = result['id']
         elif year:
             year = 0
