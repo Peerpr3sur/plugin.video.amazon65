@@ -15,6 +15,7 @@ import xbmcgui
 import xbmcaddon
 import xbmc
 import base64
+import shutil
 import binascii
 import hmac
 import time
@@ -527,7 +528,6 @@ def updateRunning():
 
 
 def copyDB(ask=False):
-    import shutil
     if ask:
         if not Dialog.yesno(getString(30193), getString(30194)):
             shutil.copystat(org_tvDBfile, tvDBfile)

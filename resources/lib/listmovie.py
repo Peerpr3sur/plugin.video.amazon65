@@ -23,9 +23,9 @@ def LIST_MOVIE_ROOT():
 
 def LIST_MOVIES_CATS():
     import movies as moviesDB
-    id = common.args.url
-    if id:
-        asins = moviesDB.lookupMoviedb(id, rvalue='asins', name='title', table='categories')
+    id_ = common.args.url
+    if id_:
+        asins = moviesDB.lookupMoviedb(id_, rvalue='asins', name='title', table='categories')
         for asin in asins.split(','):
             LIST_MOVIES('asin', asin, search=True)
         common.SetView('movies', 'movieview')
@@ -67,7 +67,7 @@ def LIST_MOVIES(filter='', value=False, sortcol=False, sortaz=True, search=False
         ADD_MOVIE_ITEM(moviedata, cmmode=cmmode, export=export)
     if not search:
         if sortaz:
-            if not 'year' in filter:
+            if 'year' not in filter:
                 xbmcplugin.addSortMethod(common.pluginhandle, xbmcplugin.SORT_METHOD_VIDEO_TITLE)
             xbmcplugin.addSortMethod(common.pluginhandle, xbmcplugin.SORT_METHOD_VIDEO_YEAR)
             xbmcplugin.addSortMethod(common.pluginhandle, xbmcplugin.SORT_METHOD_VIDEO_RUNTIME)
