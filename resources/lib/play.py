@@ -151,19 +151,19 @@ def getFlashVars(url):
     return values
 
 
-def getUrldata(mode, values, format='json', devicetypeid=False, version=1, firmware='1', opt='', extra=False, useCookie=False, retURL=False, vMT='Feature', dRes='AudioVideoUrls%2CCatalogMetadata%2CSubtitleUrls'):
+def getUrldata(mode, values, devicetypeid=False, opt='', extra=False, useCookie=False, retURL=False, vMT='Feature', dRes='AudioVideoUrls%2CCatalogMetadata%2CSubtitleUrls'):
     if not devicetypeid:
         devicetypeid = values['deviceTypeID']
     url = common.ATV_URL + '/cdp/' + mode
     url += '?asin=' + values['asin']
     url += '&deviceTypeID=' + devicetypeid
-    url += '&firmware=' + firmware
+    url += '&firmware=1'
     url += '&customerID=' + values['customer']
     url += '&deviceID=' + values['deviceID']
     url += '&marketplaceID=' + values['marketplace']
     url += '&token=' + values['token']
-    url += '&format=' + format
-    url += '&version=' + str(version)
+    url += '&format=json'
+    url += '&version=1'
     url += opt
     if extra:
         url += '&resourceUsage=ImmediateConsumption&consumptionType=Streaming&deviceDrmOverride=CENC&deviceStreamingTechnologyOverride=DASH&deviceProtocolOverride=Http&audioTrackId=all'
@@ -174,7 +174,6 @@ def getUrldata(mode, values, format='json', devicetypeid=False, version=1, firmw
     data = common.getURL(url, common.ATV_URL.split('//')[1], useCookie=useCookie)
     if data:
         jsondata = json.loads(data)
-        del data
         if "error" in jsondata:
             return False, Error(jsondata['error'])
         return True, jsondata

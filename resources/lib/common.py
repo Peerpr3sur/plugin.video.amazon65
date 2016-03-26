@@ -404,7 +404,6 @@ def GET_ASINS(content):
             feedasins = titleId + ',' + feedasins
         titleId = feedasins
     """
-    del content
     return asins, hd_key, prime_key, channels
 
 

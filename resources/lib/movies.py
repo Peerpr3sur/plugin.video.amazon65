@@ -8,14 +8,10 @@ try:
 except:
     from pysqlite2 import dbapi2 as sqlite
 
-xbmc = common.xbmc
-xbmcgui = common.xbmcgui
-re = common.re
-json = common.json
-os = common.os
+import xbmc
+import xbmcgui
+import os
 
-# Movie db
-#MAX = int(common.addon.getSetting("mov_perpage"))
 MOV_TOTAL = common.addon.getSetting("MoviesTotal")
 if MOV_TOTAL == '' or MOV_TOTAL == '0':
     MOV_TOTAL = '2400'
@@ -186,9 +182,9 @@ def addMoviesdb(full_update=True):
                 if full_update and dialog.iscanceled():
                     goAhead = -1
                     break
-                if title.has_key('titleId'):
+                if 'titleId' in title:
                     asin = title['titleId']
-                    if not '_duplicate_' in title['title']:
+                    if '_duplicate_' not in title['title']:
                         found, MOVIE_ASINS = common.compasin(MOVIE_ASINS, asin)
                         if not found:
                             new_mov += ASIN_ADD(title)
@@ -245,13 +241,13 @@ def setNewest(compList=False):
                  asins TEXT);''')
     c.execute('update movies set recent=null')
     count = 1
-    for id in catList:
-        if id == 'PrimeMovieRecentlyAdded':
-            for asin in catList[id]:
+    for id_ in catList:
+        if id_ == 'PrimeMovieRecentlyAdded':
+            for asin in catList[id_]:
                 updateMoviedb(asin, 'recent', count)
                 count += 1
         else:
-            c.execute('insert or ignore into categories values (?,?)', [id, catList[id]])
+            c.execute('insert or ignore into categories values (?,?)', [id_, catList[id_]])
     MovieDB.commit()
 
 
@@ -295,15 +291,15 @@ def ASIN_ADD(title):
     poster = None
     asin, isHD, isPrime, audio = common.GET_ASINS(title)
     movietitle = title['title']
-    if title.has_key('synopsis'):
+    if 'synopsis' in title:
         plot = title['synopsis']
     else:
         plot = None
-    if title.has_key('director'):
+    if 'director' in title:
         director = title['director']
     else:
         director = None
-    if title.has_key('runtime'):
+    if 'runtime' in title:
         runtime = str(title['runtime']['valueMillis'] / 60000)
     else:
         runtime = None
@@ -342,12 +338,12 @@ def ASIN_ADD(title):
             stars = float(title['amazonRating']['rating']) * 2
         if title['amazonRating'].has_key('count'):
             votes = str(title['amazonRating']['count'])
-    if title.has_key('restrictions'):
+    if 'restrictions' in title:
         for rest in title['restrictions']:
             if rest['action'] == 'playback':
                 if rest['type'] == 'ageVerificationRequired':
                     isAdult = True
-    if title['formats'][0].has_key('images'):
+    if 'images' in title['formats'][0]:
         try:
             thumbnailUrl = title['formats'][0]['images'][0]['uri']
             thumbnailFilename = thumbnailUrl.split('/')[-1]
@@ -355,9 +351,9 @@ def ASIN_ADD(title):
             poster = thumbnailBase + thumbnailFilename.split('.')[0] + '.jpg'
         except:
             poster = None
-    if title.has_key('heroUrl'):
+    if 'heroUrl' in title:
         fanart = title['heroUrl']
-    if not 'bbl test' in movietitle.lower() and not 'test movie' in movietitle.lower():
+    if 'bbl test' not in movietitle.lower() and 'test movie' not in movietitle.lower():
         moviedata = [common.cleanData(x) for x in [asin, None, common.checkCase(movietitle), trailer, poster, plot, director, None, runtime, year, premiered, studio, mpaa, actors, genres, stars, votes, fanart, isPrime, isHD, isAdult, None, None, audio]]
         titelnum += addMoviedb(moviedata)
     return titelnum

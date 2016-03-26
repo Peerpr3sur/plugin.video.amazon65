@@ -44,7 +44,6 @@ def LIST_TVSHOWS_CATS():
             for seasondata in tvDB.loadTVSeasonsdb(seasonasin=seasonasin).fetchall():
                 ADD_SEASON_ITEM(seasondata, disptitle=True)
         common.SetView('tvshows', 'seasonview')
-        del epidb
     else:
         for title in tvDB.lookupTVdb('', name='asins', tbl='categories', single=False):
             if title:

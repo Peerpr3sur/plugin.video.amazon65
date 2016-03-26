@@ -311,7 +311,10 @@ def delfromTVdb():
             delasins.append(asins)
         else:
             for asin in asins.split(','):
-                for item in lookupTVdb(asin, rvalue='asin', tbl='seasons', name='seriesasin'):
+                for item in lookupTVdb(asin,
+                                       rvalue='asin',
+                                       tbl='seasons',
+                                       name='seriesasin'):
                     if item:
                         delasins += (item)
         UpdateDialog(0, 0, 0, *deleteremoved(delasins))
@@ -325,12 +328,18 @@ def deleteremoved(asins, refresh=True):
     common.Log('ASINS to Remove: ' + asins.__str__())
     for item in asins:
         for seasonasin in item.split(','):
-            title, season = lookupTVdb(seasonasin, rvalue='seriestitle, season', tbl='seasons', name='asin')
+            title, season = lookupTVdb(seasonasin,
+                                       rvalue='seriestitle, season',
+                                       tbl='seasons',
+                                       name='asin')
             if title and season:
                 asin = '%' + seasonasin + '%'
                 delEpisodes += c.execute('delete from episodes where seriestitle = (?) and season = (?) and seasonasin like (?)', (title, season, asin)).rowcount
                 delSeasons += c.execute('delete from seasons where seriestitle = (?) and season = (?) and asin like (?)', (title, season, asin)).rowcount
-                if not lookupTVdb(title, rvalue='asin', tbl='seasons', name='seriestitle'):
+                if not lookupTVdb(title,
+                                  rvalue='asin',
+                                  tbl='seasons',
+                                  name='seriestitle'):
                     delShows += c.execute('delete from shows where seriestitle = (?)', (title,)).rowcount
     tvDB.commit()
     c.close()
@@ -342,7 +351,11 @@ def deleteremoved(asins, refresh=True):
 def cleanDB():
     episodeasins = getTVdbAsins('episodes', 2, value='seasonasin')
     removeAsins = []
-    for asins, season in lookupTVdb('', rvalue='asin, season', tbl='seasons', name='asin', single=False):
+    for asins, season in lookupTVdb('',
+                                    rvalue='asin, season',
+                                    tbl='seasons',
+                                    name='asin',
+                                    single=False):
         foundSeason = False
         for asin in asins.split(','):
             if asin in episodeasins:
@@ -351,7 +364,6 @@ def cleanDB():
             removeAsins.append(asins)
     if len(removeAsins):
         UpdateDialog(0, 0, 0, *deleteremoved(removeAsins, False))
-    del episodeasins  # ,seasonasins
 
 
 def getTVdbAsins(table, isPrime=1, list=False, value='asin'):
@@ -383,7 +395,6 @@ def addTVdb(full_update=True, libasins=False):
     SERIES_COUNT = 0
     SEASON_COUNT = 0
     EPISODE_COUNT = 0
-    POP_ASINS = []
 
     if full_update and not libasins:
         if common.updateRunning():
@@ -440,12 +451,10 @@ def addTVdb(full_update=True, libasins=False):
                         EPISODE_NUM.append(season_size)
             if len(titles) < MAX:
                 goAhead = 0
-            del titles
             if SERIES_ASINS:
                 ASIN_ADD(0, asins=SERIES_ASINS)
             if full_update:
                 DialogPG.update(int(EPISODE_COUNT * 100.0 / EPI_TOTAL), common.getString(30132) % SERIES_COUNT, common.getString(30133) % SEASON_COUNT, common.getString(30134) % EPISODE_COUNT)
-            goAheadepi = 1
             episodes = 0
             AsinList = ''
             EPISODE_NUM.append(MAX + 1)
@@ -457,17 +466,13 @@ def addTVdb(full_update=True, libasins=False):
                     titles = json['message']['body']['titles']
                     if titles:
                         EPISODE_COUNT += ASIN_ADD(titles)
-                    else:
-                        goAheadepi = -1
                     if full_update and DialogPG.iscanceled():
-                        goAheadepi = -1
                         goAhead = -1
                         break
                     episodes = 0
                     AsinList = ''
                     if full_update:
                         DialogPG.update(int(EPISODE_COUNT * 100.0 / EPI_TOTAL), common.getString(30132) % SERIES_COUNT, common.getString(30133) % SEASON_COUNT, common.getString(30134) % EPISODE_COUNT)
-                    del titles
         else:
             goAhead = 0
 
@@ -561,7 +566,6 @@ def UpdateDialog(SERIES_COUNT, SEASON_COUNT, EPISODE_COUNT, delShows, delSeasons
     if line1 + line2 + line3 == '':
         line2 = common.getString(30127)
     common.Log('TV Shows Update:\n%s\n%s\n%s' % (line1, line2, line3))
-    #Dialog.ok(common.getString(30126), line1, line2, line3)
 
 
 def ASIN_ADD(titles, asins=False, url=False, single=False):
@@ -756,16 +760,16 @@ def setNewest(compList=False):
                  asins TEXT);''')
     c.execute('update seasons set recent=null')
     count = 1
-    for id in catList:
-        if id == 'PrimeTVRecentlyAdded':
-            for asin in catList[id]:
+    for id_ in catList:
+        if id_ == 'PrimeTVRecentlyAdded':
+            for asin in catList[id_]:
                 seasonasin = lookupTVdb(asin, rvalue='seasonasin')
                 if not seasonasin:
                     seasonasin = asin
                 c.execute("update seasons set recent=? where asin like (?)", (count, '%' + seasonasin + '%'))
                 count += 1
         else:
-            c.execute('insert or ignore into categories values (?,?)', [id, catList[id]])
+            c.execute('insert or ignore into categories values (?,?)', [id_, catList[id_]])
     tvDB.commit()
 
 if not os.path.exists(common.tvDBfile):
