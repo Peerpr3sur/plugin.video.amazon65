@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import subprocess
 import common
 import random
 import xbmc
@@ -8,6 +7,8 @@ import xbmcplugin
 import xbmcgui
 import re
 import json
+import codecs
+from BeautifulSoup import BeautifulSoup
 
 addon = common.addon
 Dialog = xbmcgui.Dialog()
@@ -21,7 +22,7 @@ def IStreamPlayback(url, asin, trailer):
     if not values:
         return
     vMT = 'Trailer' if trailer == '1' else 'Feature'
-    title, plot, mpd = getStreams(*getUrldata('catalog/GetPlaybackResources', values, extra=True, vMT=vMT, opt='&titleDecorationScheme=primary-content'), retmpd=True)
+    title, plot, mpd, subs = getStreams(*getUrldata('catalog/GetPlaybackResources', values, extra=True, vMT=vMT, opt='&titleDecorationScheme=primary-content'), retmpd=True)
     licURL = getUrldata('catalog/GetPlaybackResources', values, extra=True, vMT=vMT, dRes='Widevine2License', retURL=True)
     common.Log(mpd)
     listitem = xbmcgui.ListItem(path=mpd)
@@ -31,9 +32,31 @@ def IStreamPlayback(url, asin, trailer):
             listitem.setInfo('video', {'Title': title + ' (Trailer)'})
         if plot:
             listitem.setInfo('video', {'Plot': plot})
+    listitem.setSubtitles(subs)
     listitem.setProperty('inputstream.mpd.license_type', 'com.widevine.alpha')
     listitem.setProperty('inputstream.mpd.license_key', licURL)
     xbmcplugin.setResolvedUrl(pluginhandle, True, listitem=listitem)
+
+
+def parseSubs(data):
+    subs = []
+    if addon.getSetting('subtitles') == 'false':
+        return subs
+    for sub in data:
+        lang = sub['displayName'].split('(')[0].strip()
+        common.Log('Convert %s Subtitle' % lang)
+        file = xbmc.translatePath('special://temp/%s.srt' % lang).decode('utf-8')
+        srt = codecs.open(file, 'w', encoding='utf-8')
+        soup = BeautifulSoup(common.getURL(sub['url']))
+        enc = soup.originalEncoding
+        num = 0
+        for caption in soup.findAll('tt:p'):
+            num += 1
+            subtext = caption.renderContents().decode(enc).replace('<tt:br>', '\n').replace('</tt:br>', '')
+            srt.write(u'%s\n%s --> %s\n%s\n\n' % (num, caption['begin'], caption['end'], subtext))
+        srt.close()
+        subs.append(file)
+    return subs
 
 
 def PLAYVIDEO():
@@ -46,7 +69,7 @@ def PLAYVIDEO():
 def getStreams(suc, data, retmpd=False):
     if not suc:
         return ''
-
+    subUrls = parseSubs(data['subtitleUrls'])
     title = plot = False
     common.prettyprint(data)
     if "catalogMetadata" in data:
@@ -56,7 +79,7 @@ def getStreams(suc, data, retmpd=False):
     for cdn in data['audioVideoUrls']['avCdnUrlSets']:
         for urlset in cdn['avUrlInfoList']:
             if retmpd:
-                return title, plot, urlset['url']
+                return title, plot, urlset['url'], subUrls
             data = common.getURL(urlset['url'])
             fps_string = re.compile('frameRate="([^"]*)').findall(data)[0]
             fr = round(eval(fps_string + '.0'), 3)
@@ -115,7 +138,7 @@ def getFlashVars(url):
     return values
 
 
-def getUrldata(mode, values, format='json', devicetypeid=False, version=1, firmware='1', opt='', extra=False, useCookie=False, retURL=False, vMT='Feature', dRes='AudioVideoUrls%2CCatalogMetadata'):
+def getUrldata(mode, values, format='json', devicetypeid=False, version=1, firmware='1', opt='', extra=False, useCookie=False, retURL=False, vMT='Feature', dRes='AudioVideoUrls%2CCatalogMetadata%2CSubtitleUrls'):
     if not devicetypeid:
         devicetypeid = values['deviceTypeID']
     url = common.ATV_URL + '/cdp/' + mode

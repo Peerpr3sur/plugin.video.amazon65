@@ -5,8 +5,9 @@
 """
 from __future__ import unicode_literals
 import resources.lib.common as common
-addon = common.addon
 import os
+import xbmcaddon
+addon = xbmcaddon.Addon()
 
 
 def modes():
