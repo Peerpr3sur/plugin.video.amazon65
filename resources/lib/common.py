@@ -220,7 +220,11 @@ def addText(name):
 def toggleWatchlist(asin=False, action='add'):
     cookie = mechanizeLogin()
     token = getToken(asin, cookie)
-    url = BASE_URL + '/gp/video/watchlist/ajax/addRemove.html?ASIN=%s&dataType=json&token=%s&action=%s' % (asin, token, action)
+    params = {"ASIN": asin,
+              "dataType": "json",
+              "token": token,
+              "action": action}
+    url = BASE_URL + '/gp/video/watchlist/ajax/addRemove.html?' + urllib.urlencode(params)
     data = json.loads(getURL(url, useCookie=cookie))
     if data['success'] == 1:
         Log(asin + ' ' + data['status'])
@@ -441,7 +445,7 @@ def getCategories():
         for cat in maincat['categories'][0]['categories']:
             subPageType = cat.get('subPageType')
             subCatId = cat.get('id')
-            if subPageType == 'PrimeMovieRecentlyAdded' or subPageType == 'PrimeTVRecentlyAdded':
+            if subPageType in ['PrimeMovieRecentlyAdded', 'PrimeTVRecentlyAdded']:
                 asins[mainCatId].update({subPageType: urlparse.parse_qs(cat['query'])['ASINList'][0].split(',')})
             elif 'prime_editors_picks' in subCatId:
                 for picks in cat['categories']:
