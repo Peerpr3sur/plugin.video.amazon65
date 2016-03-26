@@ -1,14 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import common
-
-pluginhandle = common.pluginhandle
-xbmc = common.xbmc
-xbmcplugin = common.xbmcplugin
-urllib = common.urllib
-sys = common.sys
-xbmcgui = common.xbmcgui
+import xbmcplugin
+import urllib
+import sys
 showfanart = common.addon.getSetting("useshowfanart")
+pluginhandle = common.pluginhandle
 # Television
 
 
@@ -27,9 +24,9 @@ def LIST_TV_ROOT():
 
 def LIST_TVSHOWS_CATS():
     import tv as tvDB
-    id = common.args.url
-    if id:
-        asins = tvDB.lookupTVdb(id, rvalue='asins', name='title', tbl='categories')
+    id_ = common.args.url
+    if id_:
+        asins = tvDB.lookupTVdb(id_, rvalue='asins', name='title', tbl='categories')
         epidb = tvDB.lookupTVdb('', name='asin', rvalue='asin, seasonasin', tbl='episodes', single=False)
         if not asins:
             return
@@ -83,7 +80,7 @@ def LIST_TVSHOWS(filter='', value=False, sortcol=False, sortaz=True, search=Fals
         ADD_SHOW_ITEM(showdata, cmmode=cmmode, export=export)
     if not search:
         if sortaz:
-            if not 'year' in filter:
+            if 'year' not in filter:
                 xbmcplugin.addSortMethod(pluginhandle, xbmcplugin.SORT_METHOD_LABEL)
             xbmcplugin.addSortMethod(pluginhandle, xbmcplugin.SORT_METHOD_VIDEO_YEAR)
             xbmcplugin.addSortMethod(pluginhandle, xbmcplugin.SORT_METHOD_VIDEO_RATING)

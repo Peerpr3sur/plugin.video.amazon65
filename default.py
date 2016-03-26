@@ -7,6 +7,7 @@ from __future__ import unicode_literals
 import resources.lib.common as common
 import os
 import xbmcaddon
+import sys
 addon = xbmcaddon.Addon()
 
 
