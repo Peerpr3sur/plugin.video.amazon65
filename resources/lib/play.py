@@ -152,14 +152,12 @@ def getFlashVars(url):
     return values
 
 
-def getUrldata(mode, values, devicetypeid=False, opt='', extra=False, useCookie=False, retURL=False, vMT='Feature', dRes='AudioVideoUrls,CatalogMetadata,SubtitleUrls'):
-    if not devicetypeid:
-        devicetypeid = values['deviceTypeID']
+def getUrldata(mode, values, opt='', extra=False, retURL=False, vMT='Feature', dRes='AudioVideoUrls,CatalogMetadata,SubtitleUrls'):
     url = common.ATV_URL + '/cdp/' + mode + "?"
     params = {"asin": values['asin'],
               "consumptionType": "Streaming",
               "deviceID": values['deviceID'],
-              "deviceTypeID": devicetypeid,
+              "deviceTypeID": values['deviceTypeID'],
               "firmware": 1,
               "version": 1,
               "format": "json",
@@ -182,7 +180,7 @@ def getUrldata(mode, values, devicetypeid=False, opt='', extra=False, useCookie=
         url = url + "&" + urllib.urlencode(params)
     if retURL:
         return url
-    data = common.getURL(url, common.ATV_URL.split('//')[1], useCookie=useCookie)
+    data = common.getURL(url, common.ATV_URL.split('//')[1], useCookie=False)
     if data:
         jsondata = json.loads(data)
         if "error" in jsondata:
