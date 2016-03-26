@@ -7,7 +7,7 @@ import urlparse
 
 try:
     from sqlite3 import dbapi2 as sqlite
-except:
+except ImportError:
     from pysqlite2 import dbapi2 as sqlite
 
 xbmc = common.xbmc
@@ -155,9 +155,9 @@ def getShowTypes(col):
     common.waitforDB('tv')
     c = tvDB.cursor()
     items = c.execute('select distinct %s from shows' % col)
-    list = common.getTypes(items, col)
+    types = common.getTypes(items, col)
     c.close()
-    return list
+    return types
 
 
 def getPoster(seriestitle):
@@ -311,7 +311,7 @@ def delfromTVdb():
             delasins.append(asins)
         else:
             for asin in asins.split(','):
-                for item in lookupTVdb(asin,
+                for item in lookupTVdb(value=asin,
                                        rvalue='asin',
                                        tbl='seasons',
                                        name='seriesasin'):
@@ -328,7 +328,7 @@ def deleteremoved(asins, refresh=True):
     common.Log('ASINS to Remove: ' + asins.__str__())
     for item in asins:
         for seasonasin in item.split(','):
-            title, season = lookupTVdb(seasonasin,
+            title, season = lookupTVdb(value=seasonasin,
                                        rvalue='seriestitle, season',
                                        tbl='seasons',
                                        name='asin')
@@ -336,7 +336,7 @@ def deleteremoved(asins, refresh=True):
                 asin = '%' + seasonasin + '%'
                 delEpisodes += c.execute('delete from episodes where seriestitle = (?) and season = (?) and seasonasin like (?)', (title, season, asin)).rowcount
                 delSeasons += c.execute('delete from seasons where seriestitle = (?) and season = (?) and asin like (?)', (title, season, asin)).rowcount
-                if not lookupTVdb(title,
+                if not lookupTVdb(value=title,
                                   rvalue='asin',
                                   tbl='seasons',
                                   name='seriestitle'):
@@ -351,7 +351,7 @@ def deleteremoved(asins, refresh=True):
 def cleanDB():
     episodeasins = getTVdbAsins('episodes', 2, value='seasonasin')
     removeAsins = []
-    for asins, season in lookupTVdb('',
+    for asins, season in lookupTVdb(value='',
                                     rvalue='asin, season',
                                     tbl='seasons',
                                     name='asin',
@@ -388,7 +388,7 @@ def addTVdb(full_update=True, libasins=False):
     try:
         if common.args.url == 'u':
             full_update = False
-    except:
+    except Exception:
         pass
     endIndex = 0
     goAhead = 1
@@ -589,7 +589,7 @@ def ASIN_ADD(titles, asins=False, url=False, single=False):
                 thumbnailFilename = thumbnailUrl.split('/')[-1]
                 thumbnailBase = thumbnailUrl.replace(thumbnailFilename, '')
                 poster = thumbnailBase + thumbnailFilename.split('.')[0] + '.jpg'
-            except:
+            except Exception:
                 pass
         plot = title.get('synopsis')
         if 'releaseOrFirstAiringDate' in title:
@@ -627,7 +627,7 @@ def ASIN_ADD(titles, asins=False, url=False, single=False):
                 try:
                     seriestitle = title['ancestorTitles'][0]['title']
                     seriesasin = title['ancestorTitles'][0]['titleId']
-                except:
+                except Exception:
                     pass
             else:
                 seriesasin = asin.split(',')[0]

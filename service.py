@@ -9,7 +9,7 @@ while not import_suc:
         datetime.today()
         datetime.strptime('1970-01-01', '%Y-%m-%d')
         timedelta()
-    except:
+    except Exception:
         import_suc = False
         xbmc.sleep(5000)
 
@@ -18,7 +18,7 @@ if __name__ == '__main__':
     addon = xbmcaddon.Addon()
     addon.setSetting('update_running', 'false')
     freq = addon.getSetting('auto_update')
-    id = addon.getAddonInfo('id')
+    addon_id = addon.getAddonInfo('id')
     checkfreq = 5000
     idleupdate = 300
     startidle = 0
@@ -51,7 +51,7 @@ if __name__ == '__main__':
             if dtlast + timedelta(days=freqdays) <= today and idletime >= idleupdate:
                 if update == 'false':
                     xbmc.log('AmazonDB: Starting DBUpdate (%s / %s)' % (dtlast, today))
-                    xbmc.executebuiltin('XBMC.RunPlugin(plugin://%s/?mode=<appfeed>&sitemode=<updateAll>)' % id)
+                    xbmc.executebuiltin('XBMC.RunPlugin(plugin://%s/?mode=<appfeed>&sitemode=<updateAll>)' % addon_id)
                     xbmc.sleep(10000)
                 else:
                     starttime = datetime.strptime(update, '%Y-%m-%d %H:%M')
