@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from pyDes import *
+import pyDes
 import uuid
 import cookielib
 import mechanize
@@ -211,7 +211,7 @@ def addVideo(name, asin, poster=False, fanart=False, infoLabels=False, totalItem
     if trailer:
         infoLabels['Trailer'] = u + '&trailer=<1>&selbitrate=<0>'
     u += '&trailer=<0>&selbitrate=<0>'
-    if infoLabels.has_key('Poster'):
+    if 'Poster' in infoLabels:
         liz.setArt({'tvshow.poster': infoLabels['Poster']})
     else:
         liz.setArt({'poster': poster})
@@ -267,17 +267,14 @@ def mechanizeLogin():
         cj.load(COOKIEFILE, ignore_discard=True, ignore_expires=True)
         return cj
     Log('Login')
-    succeeded = dologin()
-    retrys = 0
-    while succeeded == False:
-        xbmc.sleep(1000)
-        retrys += 1
-        Log('Login Retry: %s' % retrys)
+    for i in xrange(0, 3):
         succeeded = dologin()
-        if retrys >= 2:
-            Dialog.ok('Login Error', 'Failed to Login')
-            succeeded = True
-    return succeeded
+        if succeeded:
+            return True
+        Log('Login Retry: %s' % i)
+        xbmc.sleep(1000)
+    Dialog.ok('Login Error', 'Failed to Login')
+    return False
 
 
 def dologin():
@@ -303,7 +300,7 @@ def dologin():
         # br.set_debug_http(True)
         # br.set_debug_responses(True)
         br.addheaders = [('User-agent', UserAgent)]
-        sign_in = br.open(BASE_URL + "/gp/aw/si.html")
+        br.open(BASE_URL + "/gp/aw/si.html")
         br.select_form(name="signIn")
         br["email"] = email
         br["password"] = password
@@ -333,21 +330,25 @@ def setLoginPW():
 
 
 def encode(data):
-    k = triple_des((str(uuid.getnode()) * 2)[0:24], CBC, "\0\0\0\0\0\0\0\0", padmode=PAD_PKCS5)
-    d = k.encrypt(data)
-    return base64.b64encode(d)
+    k = pyDes.triple_des((str(uuid.getnode()) * 2)[0:24],
+                         pyDes.CBC,
+                         "\0\0\0\0\0\0\0\0",
+                         padmode=pyDes.PAD_PKCS5)
+    return base64.b64encode(k.encrypt(data))
 
 
 def decode(data):
     if not data:
         return ''
-    k = triple_des((str(uuid.getnode()) * 2)[0:24], CBC, "\0\0\0\0\0\0\0\0", padmode=PAD_PKCS5)
-    d = k.decrypt(base64.b64decode(data))
-    return d
+    k = pyDes.triple_des((str(uuid.getnode()) * 2)[0:24],
+                         pyDes.CBC,
+                         "\0\0\0\0\0\0\0\0",
+                         padmode=pyDes.PAD_PKCS5)
+    return k.decrypt(base64.b64decode(data))
 
 
 def cleanData(data):
-    if type(data) == str or type(data) == unicode:
+    if type(data) in [str, unicode]:
         if data.replace('-', '').strip() == '':
             data = ''
         data = data.replace(u'\u00A0', ' ').replace(u'\u2013', '-')
