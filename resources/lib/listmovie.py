@@ -9,7 +9,6 @@ import sys
 
 def LIST_MOVIE_ROOT():
     common.addDir(common.getString(30100), 'listmovie', 'LIST_MOVIES_SORTED', 'popularity')
-    common.addDir(common.getString(30110), 'listmovie', 'LIST_MOVIES_SORTED', 'recent')
     common.addDir(common.getString(30149), 'listmovie', 'LIST_MOVIES_CATS')
     common.addDir(common.getString(30143), 'listmovie', 'LIST_MOVIES')
     common.addDir(common.getString(30144), 'listmovie', 'LIST_MOVIE_TYPES', 'genres')
@@ -28,7 +27,7 @@ def LIST_MOVIES_CATS():
         asins = moviesDB.lookupMoviedb(id_, rvalue='asins', name='title', table='categories')
         for asin in asins.split(','):
             LIST_MOVIES('asin', asin, search=True)
-        common.SetView('movies', 'movieview')
+        common.SetView('movies')
     else:
         for title in moviesDB.lookupMoviedb('', name='asins', table='categories', single=False):
             if title:
@@ -74,7 +73,7 @@ def LIST_MOVIES(filter='', value=False, sortcol=False, sortaz=True, search=False
             xbmcplugin.addSortMethod(common.pluginhandle, xbmcplugin.SORT_METHOD_VIDEO_RATING)
             xbmcplugin.addSortMethod(common.pluginhandle, xbmcplugin.SORT_METHOD_DURATION)
             xbmcplugin.addSortMethod(common.pluginhandle, xbmcplugin.SORT_METHOD_STUDIO_IGNORE_THE)
-        common.SetView('movies', 'movieview')
+        common.SetView('movies')
     return count
 
 

@@ -461,9 +461,9 @@ def getCategories():
     return asins
 
 
-def SetView(content, view=False, updateListing=False):
+def SetView(content):
     xbmcplugin.setContent(pluginhandle, content)
-    xbmcplugin.endOfDirectory(pluginhandle, updateListing=updateListing)
+    xbmcplugin.endOfDirectory(pluginhandle, updateListing=False)
 
 
 def compasin(list_, searchstring):

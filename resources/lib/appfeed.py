@@ -101,7 +101,7 @@ def SEARCH_DB(searchString=False):
                 common.addText('          ----=== ' + common.getString(30107) + ' ===----')
                 if not listtv.LIST_TVSHOWS('seriestitle', searchString, search=True):
                     common.addText(common.getString(30202))
-                common.SetView('tvshows', 'showview')
+                common.SetView('tvshows')
 
 
 def ExportList():
@@ -119,7 +119,7 @@ def getSimilarities():
             for seasondata in tv.lookupTVdb(asin, tbl='seasons', single=False):
                 if seasondata:
                     listtv.ADD_SEASON_ITEM(seasondata, disptitle=True)
-    common.SetView('tvshows', 'showview')
+    common.SetView('tvshows')
 
 
 def ListMenu():
@@ -146,7 +146,7 @@ def ListCont(export=False):
         rvalue = 'seriesasin'
     asins = common.SCRAP_ASINS(url)
     if not asins:
-        common.SetView('movies', 'movieview')
+        common.SetView('movies')
         return
 
     asinlist = []
@@ -172,9 +172,9 @@ def ListCont(export=False):
 
     if not export:
         if mov:
-            common.SetView('movies', 'movieview')
+            common.SetView('movies')
         else:
-            common.SetView('tvshows', 'showview')
+            common.SetView('tvshows')
 
 
 def RefreshList():

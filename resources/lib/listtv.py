@@ -40,7 +40,7 @@ def LIST_TVSHOWS_CATS():
                 seasonasin = asin
             for seasondata in tvDB.loadTVSeasonsdb(seasonasin=seasonasin).fetchall():
                 ADD_SEASON_ITEM(seasondata, disptitle=True)
-        common.SetView('tvshows', 'seasonview')
+        common.SetView('seasons')
     else:
         for title in tvDB.lookupTVdb('', name='asins', tbl='categories', single=False):
             if title:
@@ -85,7 +85,7 @@ def LIST_TVSHOWS(filter='', value=False, sortcol=False, sortaz=True, search=Fals
             xbmcplugin.addSortMethod(pluginhandle, xbmcplugin.SORT_METHOD_VIDEO_YEAR)
             xbmcplugin.addSortMethod(pluginhandle, xbmcplugin.SORT_METHOD_VIDEO_RATING)
             xbmcplugin.addSortMethod(pluginhandle, xbmcplugin.SORT_METHOD_STUDIO_IGNORE_THE)
-        common.SetView('tvshows', 'showview')
+        common.SetView('tvshows')
     return count
 
 
@@ -142,7 +142,7 @@ def LIST_TV_SEASONS(seasons=False):
         for seasondata in seasons:
             ADD_SEASON_ITEM(seasondata)
     xbmcplugin.addSortMethod(pluginhandle, xbmcplugin.SORT_METHOD_LABEL)
-    common.SetView('tvshows', 'seasonview')
+    common.SetView('seasons')
 
 
 def LIST_TVSEASON_SORTED(seasons=False, cmmode=0):
@@ -151,7 +151,7 @@ def LIST_TVSEASON_SORTED(seasons=False, cmmode=0):
         seasons = tvDB.loadTVSeasonsdb(sortcol=common.args.url).fetchall()
     for seasondata in seasons:
         ADD_SEASON_ITEM(seasondata, disptitle=True, cmmode=cmmode)
-    common.SetView('tvshows', 'seasonview')
+    common.SetView('seasons')
 
 
 def ADD_SEASON_ITEM(seasondata, mode='listtv', submode='LIST_EPISODES_DB', disptitle=False, cmmode=0, onlyinfo=False, export=False):
@@ -216,7 +216,7 @@ def LIST_EPISODES_DB(owned=False, url=False):
         for episodedata in episodes:
             ADD_EPISODE_ITEM(episodedata)
     xbmcplugin.addSortMethod(pluginhandle, xbmcplugin.SORT_METHOD_LABEL)
-    common.SetView('episodes', 'episodeview')
+    common.SetView('episodes')
 
 
 def ADD_EPISODE_ITEM(episodedata, onlyinfo=False, export=False):
