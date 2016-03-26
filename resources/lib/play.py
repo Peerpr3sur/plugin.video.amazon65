@@ -9,6 +9,7 @@ import re
 import json
 import codecs
 from BeautifulSoup import BeautifulSoup
+import urllib
 
 addon = common.addon
 Dialog = xbmcgui.Dialog()
@@ -154,16 +155,20 @@ def getFlashVars(url):
 def getUrldata(mode, values, devicetypeid=False, opt='', extra=False, useCookie=False, retURL=False, vMT='Feature', dRes='AudioVideoUrls%2CCatalogMetadata%2CSubtitleUrls'):
     if not devicetypeid:
         devicetypeid = values['deviceTypeID']
-    url = common.ATV_URL + '/cdp/' + mode
-    url += '?asin=' + values['asin']
-    url += '&deviceTypeID=' + devicetypeid
-    url += '&firmware=1'
-    url += '&customerID=' + values['customer']
-    url += '&deviceID=' + values['deviceID']
-    url += '&marketplaceID=' + values['marketplace']
-    url += '&token=' + values['token']
-    url += '&format=json'
-    url += '&version=1'
+    url = common.ATV_URL + '/cdp/' + mode + "?"
+    params = {"asin": values['asin'],
+              "consumptionType": "Streaming",
+              "deviceID": values['deviceID'],
+              "deviceTypeID": devicetypeid,
+              "firmware": 1,
+              "version": 1,
+              "format": "json",
+              "marketplaceID": values['marketplace'],
+              # "operatingSystemName": "Windows",
+              # "operatingSystemVersion": "10.0",
+              "customerID": values['customer'],
+              "token": values['token']}
+    url += urllib.urlencode(params)
     url += opt
     if extra:
         url += '&resourceUsage=ImmediateConsumption&consumptionType=Streaming&deviceDrmOverride=CENC&deviceStreamingTechnologyOverride=DASH&deviceProtocolOverride=Http&audioTrackId=all'
