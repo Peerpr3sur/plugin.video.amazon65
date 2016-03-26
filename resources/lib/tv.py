@@ -723,12 +723,9 @@ def getIMDbID(asins, title):
                 imdb_id = data['imdbID']
             else:
                 oldtitle = title
-                if title.count(' - '):
-                    title = title.split(' - ')[0]
-                elif title.count(': '):
-                    title = title.split(': ')[0]
-                elif title.count('?'):
-                    title = title.replace('?', '')
+                title = title.split(' - ')[0]
+                title = title.split(': ')[0]
+                title = title.replace('?', '')
                 if title == oldtitle:
                     imdb_id = common.na
     else:
