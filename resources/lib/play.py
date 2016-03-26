@@ -152,7 +152,7 @@ def getFlashVars(url):
     return values
 
 
-def getUrldata(mode, values, devicetypeid=False, opt='', extra=False, useCookie=False, retURL=False, vMT='Feature', dRes='AudioVideoUrls%2CCatalogMetadata%2CSubtitleUrls'):
+def getUrldata(mode, values, devicetypeid=False, opt='', extra=False, useCookie=False, retURL=False, vMT='Feature', dRes='AudioVideoUrls,CatalogMetadata,SubtitleUrls'):
     if not devicetypeid:
         devicetypeid = values['deviceTypeID']
     url = common.ATV_URL + '/cdp/' + mode + "?"
@@ -171,9 +171,15 @@ def getUrldata(mode, values, devicetypeid=False, opt='', extra=False, useCookie=
     url += urllib.urlencode(params)
     url += opt
     if extra:
-        url += '&resourceUsage=ImmediateConsumption&consumptionType=Streaming&deviceDrmOverride=CENC&deviceStreamingTechnologyOverride=DASH&deviceProtocolOverride=Http&audioTrackId=all'
-        url += '&videoMaterialType=' + vMT
-        url += '&desiredResources=' + dRes
+        params = {"consumptionType": "Streaming",
+                  "desiredResources": dRes,
+                  "resourceUsage": "ImmediateConsumption",
+                  "videoMaterialType": vMT,
+                  "deviceDrmOverride": "CENC",
+                  "deviceStreamingTechnologyOverride": "DASH",
+                  "deviceProtocolOverride": "Http",
+                  "audioTrackId": "all"}
+        url = url + "&" + urllib.urlencode(params)
     if retURL:
         return url
     data = common.getURL(url, common.ATV_URL.split('//')[1], useCookie=useCookie)
