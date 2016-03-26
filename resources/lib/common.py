@@ -402,10 +402,10 @@ def SCRAP_ASINS(url):
     return []
 
 
-def getString(id, enc=False):
+def getString(string_id, enc=False):
     if enc:
-        return addon.getLocalizedString(id).encode('utf-8')
-    return addon.getLocalizedString(id)
+        return addon.getLocalizedString(string_id).encode('utf-8')
+    return addon.getLocalizedString(string_id)
 
 
 def remLoginData():
@@ -455,13 +455,13 @@ def SetView(content, view=False, updateListing=False):
     xbmcplugin.endOfDirectory(pluginhandle, updateListing=updateListing)
 
 
-def compasin(list, searchstring):
+def compasin(list_, searchstring):
     ret = False
-    for index, array in enumerate(list):
+    for array in list_:
         if searchstring.lower() in array[0].lower():
-            list[index][1] = 1
+            array[1] = 1
             ret = True
-    return ret, list
+    return ret, list_
 
 
 def waitforDB(database):
