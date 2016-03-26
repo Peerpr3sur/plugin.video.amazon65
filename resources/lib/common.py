@@ -114,7 +114,7 @@ def getURL(url, host=BASE_URL.split('//')[1], useCookie=False, silent=False, hea
     return response
 
 
-def getATVURL(url, values=None):
+def getATVURL(url):
     try:
         opener = urllib2.build_opener()
         Log('ATVURL --> url = ' + url)
@@ -122,10 +122,7 @@ def getATVURL(url, values=None):
         sig = hmac.new(hmac_key, url, hashlib.sha1)
         androidsig = base64.encodestring(sig.digest()).replace('\n', '')
         opener.addheaders = [('x-android-sign', androidsig)]
-        if not values:
-            usock = opener.open(url)
-        else:
-            usock = opener.open(url, postdata)
+        usock = opener.open(url)
         response = usock.read()
         usock.close()
     except urllib2.URLError, e:
@@ -162,19 +159,12 @@ def Log(msg, level=xbmc.LOGNOTICE):
 
 def addDir(name, mode, sitemode, url='', thumb='', fanart='', infoLabels=False, totalItems=0, cm=False, page=1, options=''):
     u = '%s?url=<%s>&mode=<%s>&sitemode=<%s>&name=<%s>&page=<%s>&opt=<%s>' % (sys.argv[0], urllib.quote_plus(url), mode, sitemode, urllib.quote_plus(name), urllib.quote_plus(str(page)), options)
-    try:
-        fanart = args.fanart
-    except:
-        pass
     if not fanart or fanart == na:
         fanart = def_fanart
     else:
         u += '&fanart=<%s>' % urllib.quote_plus(fanart)
     if not thumb:
-        try:
-            thumb = args.thumb
-        except:
-            thumb = def_fanart
+        thumb = def_fanart
     else:
         u += '&thumb=<%s>' % urllib.quote_plus(thumb)
     item = xbmcgui.ListItem(name, iconImage="DefaultFolder.png", thumbnailImage=thumb)
@@ -226,14 +216,7 @@ def addText(name):
     xbmcplugin.addDirectoryItem(handle=pluginhandle, url=sys.argv[0], listitem=item)
 
 
-def toogleWatchlist(asin=False, action='add'):
-    if not asin:
-        asin = args.asin
-        if args.remove == '1':
-            action = 'remove'
-        else:
-            action = 'add'
-
+def toggleWatchlist(asin=False, action='add'):
     cookie = mechanizeLogin()
     token = getToken(asin, cookie)
     url = BASE_URL + '/gp/video/watchlist/ajax/addRemove.html?ASIN=%s&dataType=json&token=%s&action=%s' % (asin, token, action)

@@ -99,7 +99,7 @@ def ADD_MOVIE_ITEM(moviedata, onlyinfo=False, cmmode=0, export=False):
                   'isAdult': isAdult}
     asin = asin.split(',')[0]
     cm = []
-    cm.append((common.getString(30180 + cmmode) % common.getString(30154), 'XBMC.RunPlugin(%s?mode=<common>&sitemode=<toogleWatchlist>&asin=<%s>&remove=<%s>)' % (sys.argv[0], asin, cmmode)))
+    cm.append((common.getString(30180 + cmmode) % common.getString(30154), 'XBMC.RunPlugin(%s?mode=<common>&sitemode=<toggleWatchlist>&asin=<%s>&remove=<%s>)' % (sys.argv[0], asin, cmmode)))
     cm.append((common.getString(30183), 'Container.Update(%s?mode=<appfeed>&sitemode=<getSimilarities>&asin=<%s>)' % (sys.argv[0], asin)))
     if onlyinfo:
         return infoLabels
