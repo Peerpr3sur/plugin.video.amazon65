@@ -139,7 +139,7 @@ def getUrldata(mode, values, format='json', devicetypeid=False, version=1, firmw
     if data:
         jsondata = json.loads(data)
         del data
-        if "error" not in jsondata:
+        if "error" in jsondata:
             return False, Error(jsondata['error'])
         return True, jsondata
     return False, 'HTTP Fehler'
