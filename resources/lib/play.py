@@ -13,25 +13,6 @@ addon = common.addon
 Dialog = xbmcgui.Dialog()
 pluginhandle = common.pluginhandle
 
-platform = 0
-osWindows = 1
-osLinux = 2
-osOSX = 3
-osAndroid = 4
-if xbmc.getCondVisibility('system.platform.windows'):
-    platform = osWindows
-if xbmc.getCondVisibility('system.platform.linux'):
-    platform = osLinux
-if xbmc.getCondVisibility('system.platform.osx'):
-    platform = osOSX
-if xbmc.getCondVisibility('system.platform.android'):
-    platform = osAndroid
-if xbmc.getCondVisibility('System.Platform.Linux.RaspberryPi'):
-    platform = 0
-
-hasExtRC = xbmc.getCondVisibility('System.HasAddon(script.chromium_remotecontrol)') is True
-useIntRC = addon.getSetting("remotectrl") == 'true'
-browser = int(addon.getSetting("browser"))
 verbLog = addon.getSetting('logging') == 'true'
 
 
