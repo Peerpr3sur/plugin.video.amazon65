@@ -48,7 +48,9 @@ siteVersion = siteVersionsList[siteVersion]
 
 
 # not workin yet
-BASE_URL = "https://www.amazon." + siteVersion
+# BASE_URL = "https://www.amazon." + siteVersion
+# ATV_URL = 'https://atv-ps-eu.amazon.com'
+
 
 BASE_URL = 'https://www.amazon.de'
 ATV_URL = 'https://atv-eu.amazon.com'
@@ -116,11 +118,13 @@ def getATVURL(url, values=None):
     try:
         opener = urllib2.build_opener()
         Log('ATVURL --> url = ' + url)
-        opener.addheaders = [('x-android-sign', androidsig(url))]
+        hmac_key = binascii.unhexlify('f5b0a28b415e443810130a4bcb86e50d800508cc')
+        sig = hmac.new(hmac_key, url, hashlib.sha1)
+        androidsig = base64.encodestring(sig.digest()).replace('\n', '')
+        opener.addheaders = [('x-android-sign', androidsig)]
         if not values:
             usock = opener.open(url)
         else:
-            data = urllib.urlencode(values)
             usock = opener.open(url, postdata)
         response = usock.read()
         usock.close()
@@ -154,18 +158,6 @@ def Log(msg, level=xbmc.LOGNOTICE):
         msg = msg.encode('utf-8')
     WriteLog(msg)
     xbmc.log('[%s] %s' % (__plugin__, msg.__str__()), level)
-
-
-def SaveFile(path, data):
-    file = open(path, 'w')
-    file.write(data)
-    file.close()
-
-
-def androidsig(url):
-    hmac_key = binascii.unhexlify('f5b0a28b415e443810130a4bcb86e50d800508cc')
-    sig = hmac.new(hmac_key, url, hashlib.sha1)
-    return base64.encodestring(sig.digest()).replace('\n', '')
 
 
 def addDir(name, mode, sitemode, url='', thumb='', fanart='', infoLabels=False, totalItems=0, cm=False, page=1, options=''):
