@@ -22,8 +22,18 @@ def IStreamPlayback(url, asin, trailer):
     if not values:
         return
     vMT = 'Trailer' if trailer == '1' else 'Feature'
-    title, plot, mpd, subs = getStreams(*getUrldata('catalog/GetPlaybackResources', values, extra=True, vMT=vMT, opt='&titleDecorationScheme=primary-content'), retmpd=True)
-    licURL = getUrldata('catalog/GetPlaybackResources', values, extra=True, vMT=vMT, dRes='Widevine2License', retURL=True)
+    data = getUrldata(mode='catalog/GetPlaybackResources',
+                      values=values,
+                      extra=True,
+                      vMT=vMT,
+                      opt='&titleDecorationScheme=primary-content')
+    title, plot, mpd, subs = getStreams(*data, retmpd=True)
+    licURL = getUrldata(mode='catalog/GetPlaybackResources',
+                        values=values,
+                        extra=True,
+                        vMT=vMT,
+                        dRes='Widevine2License',
+                        retURL=True)
     common.Log(mpd)
     listitem = xbmcgui.ListItem(path=mpd)
 
@@ -94,7 +104,10 @@ def getPlaybackInfo(url):
     values = getFlashVars(url)
     if not values:
         return ''
-    fr = getStreams(*getUrldata('catalog/GetPlaybackResources', values, extra=True))
+    data = getUrldata(mode='catalog/GetPlaybackResources',
+                      values=values,
+                      extra=True)
+    fr = getStreams(*data)
     Dialog.notification(xbmc.getLocalizedString(20186), '', xbmcgui.NOTIFICATION_INFO, 10, False)
     return fr
 
