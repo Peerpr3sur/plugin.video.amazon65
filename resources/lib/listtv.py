@@ -4,7 +4,7 @@ import common
 import xbmcplugin
 import urllib
 import sys
-showfanart = common.addon.getSetting("useshowfanart")
+showfanart = common.addon.getSetting("useshowfanart") == 'true'
 pluginhandle = common.pluginhandle
 # Television
 
@@ -107,10 +107,8 @@ def ADD_SHOW_ITEM(showdata, mode='listtv', submode='LIST_TV_SEASONS', cmmode=0, 
                   'AudioChannels': audio
                   }
     infoLabels = {k: v for k, v in infoLabels.items() if v}
-    if mode == 'listtv':
-        submode = 'LIST_TV_SEASONS'
-    if poster is None:
-        poster = ''
+    submode = 'LIST_TV_SEASONS' if mode == 'listtv' else submode
+    poster = '' if not poster else poster
     infoLabels['Thumb'] = poster
     infoLabels['Fanart'] = fanart
     infoLabels['Asins'] = asin
@@ -173,7 +171,7 @@ def ADD_SEASON_ITEM(seasondata, mode='listtv', submode='LIST_EPISODES_DB', dispt
         displayname += common.getString(30168, True) + str(season)
     else:
         displayname += common.getString(30169, True)
-    if showfanart == 'true':
+    if showfanart:
         fanart, cover = getFanart(seriesASIN)
     infoLabels['TotalSeasons'] = 1
     infoLabels['Thumb'] = poster
@@ -205,6 +203,7 @@ def LIST_EPISODES_DB(owned=False, url=False):
 def ADD_EPISODE_ITEM(episodedata):
     asin, seasonASIN, seriesASIN, seriestitle, season, episode, poster, mpaa, actors, genres, episodetitle, network, stars, votes, fanart, plot, airdate, year, runtime, isHD, isprime, isAdult, audio = episodedata
     tvfanart, tvposter = getFanart(seriesASIN)
+    fanart = tvfanart if showfanart else fanart
     displayname = "{} - {}".format(episode, episodetitle).replace('"', '')
     infoLabels = {'Title': episodetitle,
                   'TVShowTitle': seriestitle,
@@ -227,8 +226,6 @@ def ADD_EPISODE_ITEM(episodedata):
                   'seriesASIN': seriesASIN,
                   }
     infoLabels = {k: v for k, v in infoLabels.items() if v}
-    if showfanart == 'true':
-        fanart = tvfanart
     infoLabels['Fanart'] = fanart
     infoLabels['Thumb'] = poster
     infoLabels['Poster'] = tvposter

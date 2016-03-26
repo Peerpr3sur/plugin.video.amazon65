@@ -326,13 +326,10 @@ def ASIN_ADD(title):
                 if rest['type'] == 'ageVerificationRequired':
                     isAdult = True
     if 'images' in title['formats'][0]:
-        try:
-            thumbnailUrl = title['formats'][0]['images'][0]['uri']
-            thumbnailFilename = thumbnailUrl.split('/')[-1]
-            thumbnailBase = thumbnailUrl.replace(thumbnailFilename, '')
-            poster = thumbnailBase + thumbnailFilename.split('.')[0] + '.jpg'
-        except:
-            poster = None
+        thumbnailUrl = title['formats'][0]['images'][0]['uri']
+        thumbnailFilename = thumbnailUrl.split('/')[-1]
+        thumbnailBase = thumbnailUrl.replace(thumbnailFilename, '')
+        poster = thumbnailBase + thumbnailFilename.split('.')[0] + '.jpg'
     titelnum = 0
     if 'bbl test' not in movietitle.lower() and 'test movie' not in movietitle.lower():
         moviedata = [common.cleanData(x) for x in [asin, None, common.checkCase(movietitle), trailer, poster, plot, director, None, runtime, year, premiered, studio, mpaa, actors, genres, stars, votes, fanart, isPrime, isHD, isAdult, None, None, audio]]
