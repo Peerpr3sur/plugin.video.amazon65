@@ -195,18 +195,18 @@ def RefreshList():
         tv.updateFanart()
 
 
-def getTVDBImages(title, imdb=None, id=None, seasons=False):
+def getTVDBImages(title, imdb=None, tvdb_id=None, seasons=False):
     posterurl = fanarturl = None
     splitter = [' - ', ': ', ', ']
     langcodes = ['de', 'en']
     TVDB_URL = 'http://www.thetvdb.com/banners/'
-    while not id:
+    while not tvdb_id:
         tv = urllib.quote_plus(title)
         result = common.getURL('http://www.thetvdb.com/api/GetSeries.php?seriesname=%s&language=de' % (tv), silent=True)
         soup = BeautifulSoup(result)
-        id = soup.find('seriesid')
-        if id:
-            id = id.string
+        tvdb_id = soup.find('seriesid')
+        if tvdb_id:
+            tvdb_id = tvdb_id.string
         else:
             oldtitle = title
             for splitchar in splitter:
@@ -215,10 +215,10 @@ def getTVDBImages(title, imdb=None, id=None, seasons=False):
                     break
             if title == oldtitle:
                 break
-    if not id:
+    if not tvdb_id:
         return None, None, None
     if seasons:
-        soup = BeautifulSoup(common.getURL('http://www.thetvdb.com/api/%s/series/%s/banners.xml' % (common.tvdb, id), silent=True))
+        soup = BeautifulSoup(common.getURL('http://www.thetvdb.com/api/%s/series/%s/banners.xml' % (common.tvdb, tvdb_id), silent=True))
         seasons = {}
         for lang in langcodes:
             for datalang in soup.findAll('language'):
@@ -235,7 +235,7 @@ def getTVDBImages(title, imdb=None, id=None, seasons=False):
         return seasons, posterurl, fanarturl
     else:
         for lang in langcodes:
-            result = common.getURL('http://www.thetvdb.com/api/%s/series/%s/%s.xml' % (common.tvdb, id, lang), silent=True)
+            result = common.getURL('http://www.thetvdb.com/api/%s/series/%s/%s.xml' % (common.tvdb, tvdb_id, lang), silent=True)
             soup = BeautifulSoup(result)
             fanart = soup.find('fanart')
             poster = soup.find('poster')
@@ -244,17 +244,17 @@ def getTVDBImages(title, imdb=None, id=None, seasons=False):
             if poster and not posterurl:
                 posterurl = TVDB_URL + poster.string
             if posterurl and fanarturl:
-                return id, posterurl, fanarturl
-        return id, posterurl, fanarturl
+                return tvdb_id, posterurl, fanarturl
+        return tvdb_id, posterurl, fanarturl
 
 
 def getTMDBImages(title, imdb=None, content='movie', year=None):
-    fanart = id = None
+    fanart = movie_id = None
     splitter = [' - ', ': ', ', ']
     TMDB_URL = 'http://image.tmdb.org/t/p/original'
     yearorg = year
 
-    while not id:
+    while not movie_id:
         str_year = '&year=' + str(year) if year else ""
         movie = urllib.quote_plus(title)
         result = common.getURL('http://api.themoviedb.org/3/search/%s?api_key=%s&language=de&query=%s%s' % (content, common.tmdb, movie, str_year), silent=True)
@@ -267,7 +267,7 @@ def getTMDBImages(title, imdb=None, content='movie', year=None):
             result = data['results'][0]
             if result['backdrop_path']:
                 fanart = TMDB_URL + result['backdrop_path']
-            id = result['id']
+            movie_id = result['id']
         elif year:
             year = 0
         else:
@@ -279,7 +279,7 @@ def getTMDBImages(title, imdb=None, content='movie', year=None):
                     break
             if title == oldtitle:
                 break
-    if content == 'movie' and id and not fanart:
+    if content == 'movie' and movie_id and not fanart:
         fanart = common.na
     return fanart
 
