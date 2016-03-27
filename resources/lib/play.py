@@ -45,6 +45,7 @@ def IStreamPlayback(url, asin, trailer):
         if plot:
             listitem.setInfo('video', {'Plot': plot})
     listitem.setSubtitles(subs)
+    listitem.setProperty('inputstreamaddon', 'inputstream.mpd')
     listitem.setProperty('inputstream.mpd.license_type', 'com.widevine.alpha')
     listitem.setProperty('inputstream.mpd.license_key', licURL)
     xbmcplugin.setResolvedUrl(pluginhandle, True, listitem=listitem)
