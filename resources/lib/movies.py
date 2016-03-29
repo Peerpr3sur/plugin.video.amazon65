@@ -5,7 +5,7 @@ import appfeed
 
 try:
     from sqlite3 import dbapi2 as sqlite
-except:
+except ImportError:
     from pysqlite2 import dbapi2 as sqlite
 
 import xbmc
@@ -128,14 +128,14 @@ def getMovieTypes(col):
     return types
 
 
-def getMoviedbAsins(isPrime=1, list=False):
+def getMoviedbAsins(isPrime=1, returnlist=False):
     c = MovieDB.cursor()
     content = ''
     sqlstring = 'select asin from movies where isPrime = (%s)' % isPrime
-    if list:
+    if returnlist:
         content = []
     for item in c.execute(sqlstring).fetchall():
-        if list:
+        if returnlist:
             content.append([','.join(item), 0])
         else:
             content += ','.join(item)
@@ -146,10 +146,9 @@ def addMoviesdb(full_update=True):
     try:
         if common.args.url == 'u':
             full_update = False
-    except:
+    except Exception:
         pass
     dialog = xbmcgui.DialogProgress()
-
     if full_update:
         if common.updateRunning():
             return
@@ -159,7 +158,7 @@ def addMoviesdb(full_update=True):
         MOVIE_ASINS = []
         full_update = True
     else:
-        MOVIE_ASINS = getMoviedbAsins(list=True)
+        MOVIE_ASINS = getMoviedbAsins(returnlist=True)
 
     page = 1
     goAhead = 1

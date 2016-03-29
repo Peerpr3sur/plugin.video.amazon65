@@ -147,7 +147,7 @@ def getFlashVars(url):
     pltoken = common.getURL(common.BASE_URL + "/gp/video/streaming/player-token.json?callback=" + rand, useCookie=cookie)
     try:
         values['token'] = re.compile('"([^"]*).*"([^"]*)"').findall(pltoken)[0][1]
-    except:
+    except Exception:
         Dialog.notification(common.getString(30200), common.getString(30201), xbmcgui.NOTIFICATION_ERROR)
         return False
     return values
