@@ -174,7 +174,7 @@ def addDir(name, mode, sitemode, url='', thumb='', fanart='', infoLabels=False, 
     item.setProperty('IsPlayable', 'false')
     try:
         item.setProperty('TotalSeasons', str(infoLabels['TotalSeasons']))
-    except:
+    except Exception:
         pass
     if infoLabels:
         item.setInfo(type='Video', infoLabels=infoLabels)
@@ -183,7 +183,7 @@ def addDir(name, mode, sitemode, url='', thumb='', fanart='', infoLabels=False, 
     xbmcplugin.addDirectoryItem(handle=pluginhandle, url=u, listitem=item, isFolder=True, totalItems=totalItems)
 
 
-def addVideo(name, asin, poster=False, fanart=False, infoLabels=False, totalItems=0, cm=[], trailer=False, isAdult=False, isHD=False):
+def addVideo(name, asin, poster=False, fanart=False, infoLabels=False, totalItems=0, cm=None, trailer=False, isAdult=False, isHD=False):
     if not infoLabels:
         infoLabels = {"Title": name}
     u = '%s?asin=<%s>&mode=<play>&name=<%s>&sitemode=<PLAYVIDEO>&adult=<%s>' % (sys.argv[0], asin, urllib.quote_plus(name), str(isAdult))
@@ -192,7 +192,6 @@ def addVideo(name, asin, poster=False, fanart=False, infoLabels=False, totalItem
         fanart = def_fanart
     liz.setProperty('fanart_image', fanart)
     liz.setProperty('IsPlayable', 'true')
-    cm.insert(0, (getString(30101), 'Action(ToggleWatched)'))
     if isHD:
         liz.addStreamInfo('video', {'width': 1920, 'height': 1080})
     else:
@@ -207,7 +206,8 @@ def addVideo(name, asin, poster=False, fanart=False, infoLabels=False, totalItem
     else:
         liz.setArt({'poster': poster})
     liz.setInfo(type='Video', infoLabels=infoLabels)
-    liz.addContextMenuItems(cm, replaceItems=False)
+    if cm:
+        liz.addContextMenuItems(cm, replaceItems=False)
     xbmcplugin.addDirectoryItem(handle=pluginhandle, url=u, listitem=liz, isFolder=False, totalItems=totalItems)
 
 
@@ -371,15 +371,6 @@ def GET_ASINS(content):
             channels = 2
         if 'AC_3_5_1' in format_['audioFormatTypes']:
             channels = 6
-    """
-    if content['childTitles']:
-        feedurl = content['childTitles'][0]['feedUrl']
-        fasins = re.compile('[\?|&].*ASIN=([^&]*)').findall(feedurl)
-        if fasins: feedasins = fasins[0]
-        if titleId not in feedasins:
-            feedasins = titleId + ',' + feedasins
-        titleId = feedasins
-    """
     return asins, hd_key, prime_key, channels
 
 
@@ -409,8 +400,7 @@ def remLoginData():
 def checkCase(title):
     if title.isupper():
         title = title.title().replace('[Ov]', '[OV]').replace('Bc', 'BC')
-    title = title.replace('[dt./OV]', '')
-    return title
+    return title.replace('[dt./OV]', '')
 
 
 def getCategories():
@@ -476,7 +466,7 @@ def waitforDB(database):
         error = False
         try:
             c.execute('select distinct * from ' + tbl).fetchone()
-        except:
+        except Exception:
             error = True
             xbmc.sleep(1000)
             Log('Database locked')

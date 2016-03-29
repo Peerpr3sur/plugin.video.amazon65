@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-        AMAZON
-"""
+
 from __future__ import unicode_literals
 import resources.lib.common as common
 import os
