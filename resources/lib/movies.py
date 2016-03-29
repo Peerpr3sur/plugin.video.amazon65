@@ -3,10 +3,7 @@
 import common
 import appfeed
 
-try:
-    from sqlite3 import dbapi2 as sqlite
-except ImportError:
-    from pysqlite2 import dbapi2 as sqlite
+from sqlite3 import dbapi2 as sqlite
 
 import xbmc
 import xbmcgui
@@ -51,14 +48,6 @@ def createMoviedb():
                  PRIMARY KEY(movietitle,year,asin))''')
     MovieDB.commit()
     c.close()
-
-
-def addMoviedb(moviedata):
-    c = MovieDB.cursor()
-    num = c.execute('insert or ignore into movies values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', moviedata).rowcount
-    if num:
-        MovieDB.commit()
-    return num
 
 
 def lookupMoviedb(value, rvalue='distinct *', name='asin', single=True, exact=False, table='movies'):
@@ -330,7 +319,11 @@ def ASIN_ADD(title):
     titelnum = 0
     if 'bbl test' not in movietitle.lower() and 'test movie' not in movietitle.lower():
         moviedata = [common.cleanData(x) for x in [asin, None, common.checkCase(movietitle), trailer, poster, plot, director, None, runtime, year, premiered, studio, mpaa, actors, genres, stars, votes, fanart, isPrime, isHD, isAdult, None, None, audio]]
-        titelnum += addMoviedb(moviedata)
+        c = MovieDB.cursor()
+        num = c.execute('insert or ignore into movies values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', moviedata).rowcount
+        if num:
+            MovieDB.commit()
+        titelnum += num
     return titelnum
 
 if not os.path.exists(common.MovieDBfile):
