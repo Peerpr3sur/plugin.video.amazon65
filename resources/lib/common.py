@@ -140,7 +140,7 @@ def WriteLog(data, fn='', mode='a'):
     if fn:
         fn = '-' + fn
     fn = __plugin__ + fn + '.log'
-    if type(data) == unicode:
+    if isinstance(data, unicode):
         data = data.encode('utf-8')
     data = time.strftime('[%d.%m/%H:%M:%S] ', time.localtime()) + data.__str__()
     path = os.path.join(homepath, fn)
@@ -152,7 +152,7 @@ def WriteLog(data, fn='', mode='a'):
 def Log(msg, level=xbmc.LOGNOTICE):
     if level == xbmc.LOGDEBUG and verbLog:
         level = xbmc.LOGNOTICE
-    if type(msg) == unicode:
+    if isinstance(msg, unicode):
         msg = msg.encode('utf-8')
     WriteLog(msg)
     xbmc.log('[%s] %s' % (__plugin__, msg.__str__()), level)
@@ -336,7 +336,7 @@ def decode(data):
 
 
 def cleanData(data):
-    if type(data) in [str, unicode]:
+    if isinstance(data, (str, unicode)):
         if data.replace('-', '').strip() == '':
             data = ''
         data = data.replace(u'\u00A0', ' ').replace(u'\u2013', '-')
@@ -344,19 +344,6 @@ def cleanData(data):
         if data == '':
             data = None
     return data
-
-
-def cleanName(name, file=True):
-    if file:
-        notallowed = ['<', '>', ':', '"', '\\', '/', '|', '*', '?']
-        name = name.decode('utf-8')
-    else:
-        notallowed = ['<', '>', '"', '|', '*', '?']
-        if not os.path.supports_unicode_filenames:
-            name = name.encode('utf-8')
-    for c in notallowed:
-        name = name.replace(c, '')
-    return name
 
 
 def GET_ASINS(content):
@@ -501,7 +488,7 @@ def getTypes(items, col):
     lowlist = []
     for data in items:
         data = data[0]
-        if type(data) == str:
+        if isinstance(data, str):
             if 'Rated' in data:
                 item = data.split('for')[0]
                 if item and item not in types and item != 'Inc.' and item != 'LLC.':

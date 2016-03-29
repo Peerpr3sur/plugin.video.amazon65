@@ -107,12 +107,12 @@ def updateMoviedb(asin, col, value):
     return result
 
 
-def loadMoviedb(filter=False, value=False, sortcol=False):
+def loadMoviedb(movie_filter=False, value=False, sortcol=False):
     common.waitforDB('movie')
     c = MovieDB.cursor()
-    if filter:
+    if movie_filter:
         value = '%' + value + '%'
-        return c.execute('select distinct * from movies where %s like (?)' % filter, (value,))
+        return c.execute('select distinct * from movies where %s like (?)' % movie_filter, (value,))
     elif sortcol:
         return c.execute('select distinct * from movies where %s is not null order by %s asc' % (sortcol, sortcol))
     else:

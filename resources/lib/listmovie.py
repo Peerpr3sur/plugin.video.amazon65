@@ -59,7 +59,7 @@ def LIST_MOVIES(filter='', value=False, sortcol=False, sortaz=True, search=False
     import movies as moviesDB
     if 'year' in filter:
         value = value.replace('0 -', '')
-    movies = moviesDB.loadMoviedb(filter=filter, value=value, sortcol=sortcol)
+    movies = moviesDB.loadMoviedb(movie_filter=filter, value=value, sortcol=sortcol)
     count = 0
     for moviedata in movies:
         count += 1

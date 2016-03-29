@@ -368,9 +368,7 @@ def cleanDB():
 
 def getTVdbAsins(table, isPrime=1, list=False, value='asin'):
     c = tvDB.cursor()
-    content = ''
-    if list:
-        content = []
+    content = [] if list else ""
     sqlstring = 'select %s from %s' % (value, table)
     if isPrime < 2:
         sqlstring += ' where isPrime = (%s)' % isPrime
@@ -419,7 +417,12 @@ def addTVdb(full_update=True, libasins=False):
             return
 
     while goAhead == 1:
-        json = appfeed.getList('tvepisode,tvseason,tvseries&RollupToSeason=T', endIndex, isPrime=prime, OrderBy='Title', NumberOfResults=MAX, AsinList=new_libasins)
+        json = appfeed.getList('tvepisode,tvseason,tvseries&RollupToSeason=T',
+                               endIndex,
+                               isPrime=prime,
+                               OrderBy='Title',
+                               NumberOfResults=MAX,
+                               AsinList=new_libasins)
         titles = json['message']['body']['titles']
         if titles:
             SERIES_ASINS = ''
@@ -462,7 +465,11 @@ def addTVdb(full_update=True, libasins=False):
                 episodes += EPISODE_NUM[index]
                 AsinList += ','.join(item) + ','
                 if (episodes + EPISODE_NUM[index + 1]) > MAX:
-                    json = appfeed.getList('TVEpisode', 0, isPrime=prime, NumberOfResults=MAX, AsinList=AsinList)
+                    json = appfeed.getList('TVEpisode',
+                                           0,
+                                           isPrime=prime,
+                                           NumberOfResults=MAX,
+                                           AsinList=AsinList)
                     titles = json['message']['body']['titles']
                     if titles:
                         EPISODE_COUNT += ASIN_ADD(titles)
@@ -568,7 +575,7 @@ def UpdateDialog(SERIES_COUNT, SEASON_COUNT, EPISODE_COUNT, delShows, delSeasons
     common.Log('TV Shows Update:\n%s\n%s\n%s' % (line1, line2, line3))
 
 
-def ASIN_ADD(titles, asins=False, url=False, single=False):
+def ASIN_ADD(titles, asins=False):
     if asins:
         titles = appfeed.ASIN_LOOKUP(asins)['message']['body']['titles']
     count = 0
@@ -619,8 +626,6 @@ def ASIN_ADD(titles, asins=False, url=False, single=False):
                 seasontotal = title['childTitles'][0]['size']
             showdata = [common.cleanData(x) for x in [asin, common.checkCase(seriestitle), plot, studio, mpaa, genres, actors, premiered, year, stars, votes, seasontotal, 0, audio, isHD, isPrime, None, None, None, poster, None, fanart]]
             count += addDB('shows', showdata)
-            if single:
-                return asin, ASINLIST
         elif contentType == 'SEASON':
             season = title['number']
             if title['ancestorTitles']:
