@@ -11,7 +11,7 @@ while not import_suc:
         timedelta()
     except Exception:
         import_suc = False
-        xbmc.sleep(5000)
+        xbmc.sleep(2000)
 
 if __name__ == '__main__':
     xbmc.log('AmazonDB: Service Start')
@@ -19,12 +19,12 @@ if __name__ == '__main__':
     addon.setSetting('update_running', 'false')
     freq = addon.getSetting('auto_update')
     addon_id = addon.getAddonInfo('id')
-    checkfreq = 5000
     idleupdate = 300
     startidle = 0
+    monitor = xbmc.Monitor()
 
     if (not freq == '') and (not freq == '0'):
-        while not xbmc.abortRequested:
+        while not monitor.abortRequested():
             today = datetime.today()
             freq = addon.getSetting('auto_update')
             last = addon.getSetting('last_update')
@@ -52,7 +52,8 @@ if __name__ == '__main__':
                 if update == 'false':
                     xbmc.log('AmazonDB: Starting DBUpdate (%s / %s)' % (dtlast, today))
                     xbmc.executebuiltin('XBMC.RunPlugin(plugin://%s/?mode=<appfeed>&sitemode=<updateAll>)' % addon_id)
-                    xbmc.sleep(10000)
+                    if monitor.waitForAbort(10):
+                        break
                 else:
                     starttime = datetime.strptime(update, '%Y-%m-%d %H:%M')
                     if (starttime + timedelta(hours=6)) <= today:
@@ -60,5 +61,6 @@ if __name__ == '__main__':
                         xbmc.log('AmazonDB: Cancel update - duration > 6 hours')
                     else:
                         xbmc.log('AmazonDB: Update already running', xbmc.LOGDEBUG)
-            xbmc.sleep(checkfreq)
+            if monitor.waitForAbort(5):
+                break
     xbmc.log('AmazonDB: Service End')
