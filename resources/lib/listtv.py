@@ -191,6 +191,7 @@ def LIST_EPISODES_DB(owned=False, url=False):
         for episodedata in episodes:
             ADD_EPISODE_ITEM(episodedata)
     xbmcplugin.addSortMethod(pluginhandle, xbmcplugin.SORT_METHOD_LABEL)
+    xbmcplugin.addSortMethod(pluginhandle, xbmcplugin.SORT_METHOD_EPISODE)
     common.SetView('episodes')
 
 
